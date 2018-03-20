@@ -1,0 +1,18 @@
+body, html {
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    border: none;
+    font-family: Tahoma, sans-serif;
+    width: 800px;
+    color: #222222;
+}
+
+html {
+    box-sizing: border-box;
+}
+
+*, *::after, *::before {
+    box-sizing: border-box;
+}
