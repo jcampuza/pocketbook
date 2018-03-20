@@ -5,7 +5,7 @@ import AceEditor from 'react-ace';
 import 'brace/mode/javascript';
 import 'brace/theme/monokai';
 
-export const CodeEditor = ({ onChange, value }) => (
+export const CodeEditor = ({ onChange, value, readOnly = false }) => (
   <AceEditor
     theme="monokai"
     mode="javascript"
@@ -15,5 +15,6 @@ export const CodeEditor = ({ onChange, value }) => (
     tabSize={2}
     fontSize={14}
     width="100%"
+    readOnly={readOnly}
   />
 );

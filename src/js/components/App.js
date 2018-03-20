@@ -21,7 +21,7 @@ const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
   overflow-y: auto;
-  transition: flex-basis 300ms ease-out;
+  transition: flex-basis 200ms ease-out;
 
   flex-basis: ${props => props.fullWidth 
     ? '100%'
@@ -154,7 +154,8 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
     <ScriptContainer>
       <ScriptTitle>{script.title}</ScriptTitle>
       <ScriptDescription>{script.description}</ScriptDescription>
-      <CodeDisplay>{script.body}</CodeDisplay>
+      <CodeEditor value={script.body} readOnly={true} />
+      {/* <CodeDisplay>{script.body}</CodeDisplay> */}
 
       <ScriptActions>
         <Button onClick={() => onRun(script.id)}>Run</Button>
