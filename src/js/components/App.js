@@ -1,61 +1,15 @@
 import React, { Component } from "react";
 import styled from 'styled-components';
 
-import ScriptForm from "../ScriptForm";
-import { Script } from "../../models/script";
-import { injectScript } from "../../lib/injectScript";
+import { Script } from "../models/script";
+import { injectScript } from "../lib/injectScript";
+import { CodeEditor } from "./CodeEditor";
+import { mockScripts } from "../mocks";
+import { AppSidebar } from "./AppSidebar";
+import { Button } from "./Button";
+import { createDefaultScript, guid, getLastSelectedScriptFromStorage } from "../util";
 
-const scripts = localStorage.getItem('scripts') || [
-  {
-    id: 1,
-    title: 'Return Appointment',
-    description: `
-      Returns an appointment in the flexdrive dealer portal.
-      Will skip through all the flows with the default options checked, or the
-      least destructive options`,
-    body: `function helloWorld() {
-  console.log("hello world");`
-  },
-  {
-    id: 2,
-    title: 'Pickup Appointment',
-    description: `
-      Pickup an appointment in the flexdrive dealer portal.
-      Will skip through all the flows with the default options checked, or the
-      least destructive options`,
-    body: `// PICKUP SUP
-    (async () => {
-      const delay = (ms) => new Promise(res => setTimeout(() => res(), ms));
-      const qsa = (sel) => Array.from(document.querySelectorAll(sel));	
-      const clickContinue = () => {
-        const btns = qsa('button');
-        btns.find(btn => btn.innerText === 'Continue').click();	
-      }
-
-      // check verify infos
-      const checks = qsa('input[type="checkbox"]');
-      checks.forEach(check => check.click());
-      clickContinue();
-
-      await delay(200);
-
-      // vehicle Inspection
-      const radioGroups = qsa('.InspectionCard__RadioList');
-      radioGroups.forEach(group => {
-        const radios = group.querySelectorAll('input[type="radio"]');
-        radios[0].click();
-      });
-
-      clickContinue();
-      await delay(200);
-
-      // tap to sign
-      const tappable = qsa('[data-hook=tap-to-sign]');
-      tappable[0].click();
-    })()`
-
-  }
-];
+const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
 
 const AppContainer = styled.div`
   display: flex;
@@ -63,51 +17,16 @@ const AppContainer = styled.div`
   height: 400px;
 `;
 
-const AppSidebarContainer = styled.section`
-  flex: 0 0 33%;
-  border-left: 1px solid #999999;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.05);
-`;
-
-const SidebarList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  background-color: #ffffff;
-`;
-
-const SidebarListItem = styled.li`
-  padding: .5rem .5rem;
-  border-bottom: 1px solid #999;
-
-  &:hover {
-    background-color: rgba(0,0,0,0.02);
-    cursor: pointer;
-  }
-`;
-
-const ScriptListItem = ({ script, onClick }) => {
-  const { title, id } = script;
-
-  return (
-    <SidebarListItem onClick={() => onClick(id)}>{title}</SidebarListItem>
-  )
-}
-
-const SidebarAddListItem = SidebarListItem.extend`
-  background-color: #eaeaea;
-
-  &:hover {
-    background-color: rgba(0,0,0,0.03);
-    cursor: pointer;
-  }
-`;
-
 const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
   overflow-y: auto;
+  transition: flex-basis 300ms ease-out;
+
+  flex-basis: ${props => props.fullWidth 
+    ? '100%'
+    : '66%'
+  };
 `;
 
 const NoneSelectedView = styled.div`
@@ -165,33 +84,37 @@ const ScriptActions = styled.div`
   }
 `
 
-const Button = styled.button`
-  border: none;
-  border-radius: 2px;
-  background-color: #e0e0e0;
-  padding: 0 8px;
-  height: 24px;
-  min-width: 60px;
-  cursor: pointer;
-`
-
 class EditScript extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      clean: props.script,
-      dirty: { ...props.script }
+      dirty: {
+        ...props.script 
+      }
     };
   }
 
   updateField = (e) => {
     const { name, value } = e.target;
+    
     const dirty = {
-      [name]: value,
       ...this.state.dirty,
-    }
-    console.log(dirty);
+      [name]: value,
+    };
+    
+    this.setState({ dirty })
+  }
+
+  onEditorChange = (value) => {
+    const name = 'body';
+    
+    const dirty = {
+      ...this.state.dirty,
+      [name]: value,
+    };
+
+    this.setState({ dirty });
   }
 
   render() {
@@ -212,10 +135,13 @@ class EditScript extends Component {
 
         <input name="title" placeholder="title" value={title} onChange={this.updateField} />
         <textarea name="description" placeholder="description" value={description} onChange={this.updateField} />
-        <textarea name="body" placeholder="function body" value={body} onChange={this.updateField} />
 
+        <CodeEditor 
+          onChange={this.onEditorChange} 
+          value={body}
+        />
         <ScriptActions>
-          <Button onClick={() => onSubmit(script)}>Save</Button>
+          <Button onClick={() => onSubmit(this.state.dirty)}>Save</Button>
           <Button onClick={() => onCancel()}>Cancel</Button>
         </ScriptActions>
       </ScriptContainer>
@@ -239,18 +165,18 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   </React.Fragment>
 );
 
-const getLastSelectedScriptFromStorage = () => {
-  const lastSelectedId = parseInt(localStorage.getItem('last-selected'), 10);
-
-  return scripts.find(script => script.id === lastSelectedId);
-}
-
 export default class extends Component {
   state = {
     isCreating: false,
     isEditing: false,
+    mainViewExpanded: false,
     scripts,
-    selectedScript: getLastSelectedScriptFromStorage()
+    selectedScript: getLastSelectedScriptFromStorage(scripts)
+  }
+
+  syncWithStorage = () => {
+    localStorage.setItem('scripts', JSON.stringify(this.state.scripts));
+    console.log('SYNCED WITH STORAGE');
   }
 
   toggleCreating = () => {
@@ -277,20 +203,35 @@ export default class extends Component {
     localStorage.setItem('last-selected', id);
   }
 
+  onAddItemClicked = () => {
+    const scripts = this.state.scripts;
+    const newScript = createDefaultScript();
+    console.log(newScript);
+
+    this.setState({
+      scripts: [...scripts, newScript],
+      selectedScript: newScript
+    });
+  }
+
   onEditScript = () => {
     this.setState({ isEditing: true });
   }
 
   onEditSubmit = (script) => {
     const scripts = this.state.scripts.map(s => s.id === script.id ? script : s);
-    this.setState({ scripts });
+    this.setState({
+      scripts,
+      isEditing: false,
+      selectedScript: scripts.find(s => s.id === script.id)
+    }, this.syncWithStorage);
   }
 
   onDeleteScript = (id) => {
     let { scripts } = this.state.scripts;
 
     scripts = this.state.scripts.filter(script => script.id !== id);
-    this.setState({ scripts });
+    this.setState({ scripts, selectedScript: null });
   }
 
   onRunScript = (id) => {
@@ -302,12 +243,13 @@ export default class extends Component {
       isCreating,
       isEditing,
       selectedScript,
-      scripts
+      scripts,
+      mainViewExpanded
     } = this.state;
 
     return (
       <AppContainer>
-        <AppMainContainer>
+        <AppMainContainer fullWidth={isEditing}>
           {selectedScript
             ? isEditing
               ? <EditScript
@@ -324,14 +266,11 @@ export default class extends Component {
             : <NoneSelectedView>No Script Selected</NoneSelectedView>
           }
         </AppMainContainer>
-        <AppSidebarContainer>
-          <SidebarList>
-            {scripts.map(script =>
-              <ScriptListItem onClick={this.onListItemClicked} script={script} key={script.id}/> 
-            )}
-            <SidebarAddListItem>Add Item</SidebarAddListItem>
-          </SidebarList>
-        </AppSidebarContainer>
+        <AppSidebar 
+          onListItemClicked={this.onListItemClicked}
+          onAddItemClicked={this.onAddItemClicked}
+          scripts={scripts}
+        />
       </AppContainer>
     );
   }
