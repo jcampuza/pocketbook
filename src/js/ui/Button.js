@@ -10,3 +10,11 @@ export const Button = styled.button`
   min-width: 60px;
   cursor: pointer;
 `;
+
+export const ButtonContainer = styled.div`
+  display: block;
+
+  > ${Button} + ${Button} {
+    margin-left: 1rem;
+  }
+`;

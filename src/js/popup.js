@@ -5,16 +5,24 @@ import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
 
 import '../css/popup.css';
 import { Link } from 'react-router-dom';
-import App from './components/App';
-import { Settings } from './components/Settings';
+import { Main, About, Settings } from './routes';
 import { SettingsStore } from './stores/SettingsStore';
 import { Provider } from 'mobx-react';
 import { Storage } from './lib/storage';
 import { NotificationStore } from './stores/NotificationStore';
+import { NotificationContainer } from './components/ModalContainer';
+import { debugLog } from './util';
+import { ScriptStore } from './stores/ScriptStore';
+import { configure as configureMobx } from 'mobx';
+
+const isDev = process.env.NODE_ENV === 'development';
+const mobxConfig = { enforceActions: isDev };
+configureMobx(mobxConfig);
 
 const storage = new Storage(localStorage);
 const settingsStore = new SettingsStore(storage);
 const notificationStore = new NotificationStore();
+const scriptStore = new ScriptStore(storage);
 
 const AppContainer = styled.div`
   position: relative;
@@ -59,24 +67,31 @@ const NavLink = styled(Link)`
 `;
 
 const Core = () => (
-  <Provider settingsStore={settingsStore} notificationStore={notificationStore}>
+  <Provider
+    settingsStore={settingsStore}
+    notificationStore={notificationStore}
+    scriptStore={scriptStore}
+  >
     <Router>
       <AppContainer>
         <AppNavigationContainer>
           <AppNavigation>
             <NavLink to="/">TODO</NavLink>
             <NavLink to="/settings">TODO</NavLink>
+            <NavLink to="/about">TODO</NavLink>
           </AppNavigation>
         </AppNavigationContainer>
         <Switch>
-          <Route exact path="/" component={App} />
-          <Route exact path="/settings" component={Settings} />
+          <Route exact path="/" component={Main} />
+          <Route path="/settings" component={Settings} />
+          <Route path="/about" component={About} />
         </Switch>
 
-        <AppModals />
+        <NotificationContainer />
       </AppContainer>
     </Router>
   </Provider>
 );
 
+debugLog('APPLICATION MOUNTING');
 render(<Core />, window.document.getElementById('app-container'));

@@ -13,9 +13,12 @@ export class Storage {
   }
 
   getItems(...keys) {
-    return keys.reduce((acc, key) => {
-      acc[key] = localStorage.getItem(key);
-    }, {});
+    const res = {};
+    for (const key of keys) {
+      res[key] = localStorage.getItem(key);
+    }
+
+    return res;
   }
 
   setItem(key, value) {
@@ -24,7 +27,7 @@ export class Storage {
 
   setItems(keyValuePairs) {
     for (const key of Object.keys(keyValuePairs)) {
-      this.setItem(key, keyValuePairs[key]);
+      this.storage.setItem(key, keyValuePairs[key]);
     }
   }
 
@@ -34,7 +37,7 @@ export class Storage {
 
   removeItems(...keys) {
     for (const key of keys) {
-      this.removeItem(key);
+      this.storage.removeItem(key);
     }
   }
 

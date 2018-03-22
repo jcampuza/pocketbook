@@ -4,9 +4,9 @@ import styled from 'styled-components';
 
 import { Script } from '../models/script';
 import { injectScript } from '../lib/injectScript';
-import { CodeEditor } from './CodeEditor';
+import { CodeEditor } from '../components/CodeEditor';
 import { mockScripts } from '../mocks';
-import { AppSidebar } from './AppSidebar';
+import { AppSidebar } from '../components/AppSidebar';
 import { Button } from '../ui/Button';
 import {
   createDefaultScript,
@@ -16,6 +16,7 @@ import {
 } from '../util';
 import { TextInput } from '../ui/TextInput';
 import { TextArea } from '../ui/Textarea';
+import { observer, inject } from 'mobx-react';
 
 const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
 const AppMainContainer = styled.main`
@@ -168,7 +169,9 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   </React.Fragment>
 );
 
-export default class extends Component {
+@inject('scriptStore', 'notificationStore')
+@observer
+export class Main extends Component {
   state = {
     isCreating: false,
     isEditing: false,
@@ -192,11 +195,6 @@ export default class extends Component {
     this.setState({ mainViewExpanded: !this.state.mainViewExpanded });
   }
 
-  syncWithStorage = () => {
-    localStorage.setItem('scripts', JSON.stringify(this.state.scripts));
-    console.log('SYNCED WITH STORAGE');
-  };
-
   toggleCreating = () => {
     this.setState({ isCreating: true });
   };
@@ -205,17 +203,11 @@ export default class extends Component {
     this.setState({ isEditing: false });
   };
 
-  addScript = script => {
-    this.setState({
-      scripts: [...this.state.scripts, script],
-      isCreating: false,
-    });
-  };
-
   onListItemClicked = id => {
-    const { scripts } = this.state;
+    const { scriptStore } = this.props;
+    // const { scripts } = this.state;
 
-    const selectedScript = scripts.find(script => script.id === id);
+    const selectedScript = scriptStore.scripts.find(script => script.id === id);
     this.setState({ selectedScript });
 
     localStorage.setItem('last-selected', id);
@@ -227,14 +219,11 @@ export default class extends Component {
   };
 
   onAddItemClicked = () => {
-    const scripts = this.state.scripts;
+    const { scriptStore } = this.props;
     const newScript = createDefaultScript();
-    console.log(newScript);
+    scriptStore.addScript(newScript);
 
-    this.setState({
-      scripts: [...scripts, newScript],
-      selectedScript: newScript,
-    });
+    this.setState({ selectedScript: newScript });
   };
 
   toggleEditing = () => {
@@ -242,24 +231,18 @@ export default class extends Component {
   };
 
   onEditSubmit = script => {
-    const scripts = this.state.scripts.map(
-      s => (s.id === script.id ? script : s),
-    );
-    this.setState(
-      {
-        scripts,
-        isEditing: false,
-        selectedScript: scripts.find(s => s.id === script.id),
-      },
-      this.syncWithStorage,
-    );
+    const { scriptStore } = this.props;
+
+    scriptStore.editScript(script);
+    this.setState({
+      isEditing: false,
+      selectedScript: script,
+    });
   };
 
   onDeleteScript = id => {
-    let { scripts } = this.state.scripts;
-
-    scripts = this.state.scripts.filter(script => script.id !== id);
-    this.setState({ scripts, selectedScript: null }, this.syncWithStorage);
+    const { scriptStore } = this.props;
+    scriptStore.removeScript(id);
   };
 
   onRunScript = id => {
@@ -271,9 +254,10 @@ export default class extends Component {
       isCreating,
       isEditing,
       selectedScript,
-      scripts,
       mainViewExpanded,
     } = this.state;
+
+    const { scripts } = this.props.scriptStore;
 
     return (
       <React.Fragment>

@@ -8,4 +8,5 @@ export const TextArea = styled.textarea`
   width: 50%;
   min-width: 50%;
   max-width: 50%;
+  display: block;
 `;

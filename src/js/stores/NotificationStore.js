@@ -4,10 +4,16 @@ export class NotificationStore {
   @observable notifications = [];
 
   @action.bound
-  addNotification(notification) {
+  addNotification(notification, timeout = 4000) {
     const id = Date.now();
     notification.id = id;
-    notification.timer = setTimeout(() => this.removeNotification(id));
+
+    if (!notification.sticky) {
+      notification.timer = setTimeout(
+        () => this.removeNotification(id),
+        timeout,
+      );
+    }
 
     this.notifications.push(notification);
   }
@@ -18,13 +24,15 @@ export class NotificationStore {
       element => element.id === notificationId,
     );
 
-    clearTimeout(this.notifications[index].timer);
-    this.notifications.remove(notification);
+    if (notification != null) {
+      clearTimeout(notification.timer);
+      this.notifications.remove(notification);
+    }
   }
 
   @action.bound
   clearNotifications() {
-    // Shallow copy so that we run into an issue mutating the array
+    // Shallow copy so that we don't run into an issue mutating the observable array
     const notifications = this.notifications.slice();
     notifications.forEach(notification =>
       this.removeNotification(notification.id),
