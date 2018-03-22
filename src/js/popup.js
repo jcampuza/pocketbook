@@ -10,9 +10,11 @@ import { Settings } from './components/Settings';
 import { SettingsStore } from './stores/SettingsStore';
 import { Provider } from 'mobx-react';
 import { Storage } from './lib/storage';
+import { NotificationStore } from './stores/NotificationStore';
 
 const storage = new Storage(localStorage);
 const settingsStore = new SettingsStore(storage);
+const notificationStore = new NotificationStore();
 
 const AppContainer = styled.div`
   position: relative;
@@ -57,7 +59,7 @@ const NavLink = styled(Link)`
 `;
 
 const Core = () => (
-  <Provider settingsStore={settingsStore}>
+  <Provider settingsStore={settingsStore} notificationStore={notificationStore}>
     <Router>
       <AppContainer>
         <AppNavigationContainer>
