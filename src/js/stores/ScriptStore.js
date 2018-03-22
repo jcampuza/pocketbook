@@ -7,7 +7,7 @@ export class ScriptStore {
 
   constructor(storage) {
     this._storage = storage;
-    this.scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
+    this.scripts = JSON.parse(this._storage.getItem('scripts')) || mockScripts;
 
     autorun(() => {
       const scripts = this.scripts.slice();
