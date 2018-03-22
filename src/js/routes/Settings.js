@@ -11,6 +11,8 @@ const SettingsContainer = styled.div`
   display: block;
   height: 500px;
   padding: 1rem;
+  color: ${props => props.theme.textColor};
+  background-color: ${props => props.theme.primaryColor};
 
   > * + * {
     margin-bottom: 1rem;
@@ -41,7 +43,7 @@ const SelectLabel = styled.label`
 const OptionList = ({ options }) =>
   options.map(option => <option value={option.value}>{option.label}</option>);
 
-@inject('settingsStore', 'scriptStore', 'notificationStore')
+@inject('settingsStore', 'scriptStore', 'notificationStore', 'themeStore')
 @observer
 export class Settings extends Component {
   state = {
@@ -91,7 +93,7 @@ export class Settings extends Component {
   };
 
   render() {
-    const { settingsStore } = this.props;
+    const { settingsStore, themeStore } = this.props;
     const {
       importText,
       isImporting,
@@ -118,7 +120,10 @@ export class Settings extends Component {
 
         <FormInput>
           <SelectLabel>Extension Theme</SelectLabel>
-          <SelectInput>
+          <SelectInput
+            value={themeStore.currentTheme}
+            onChange={e => themeStore.setTheme(e.target.value)}
+          >
             <OptionList
               options={extensionThemes.map(theme => ({
                 value: theme,

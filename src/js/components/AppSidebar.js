@@ -4,7 +4,8 @@ import styled from 'styled-components';
 const SidebarContainer = styled.section`
   position: relative;
   overflow-y: scroll;
-  background-color: rgb(245, 245, 245);
+  background-color: ${props => props.theme.sidebarColor};
+  /* background-color: rgb(245, 245, 245); */
 `;
 
 const SidebarList = styled.ul`

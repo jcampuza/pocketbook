@@ -23,7 +23,8 @@ const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
   overflow-y: auto;
-  transition: flex-basis 200ms ease-out;
+  color: ${props => props.theme.textColor}
+  background-color: ${props => props.theme.primaryColor};
 
   flex-basis: ${props => (props.fullWidth ? '92%' : '66%')};
 `;
@@ -50,13 +51,13 @@ const ScriptContainer = styled.section`
 const ScriptTitle = styled.h3`
   margin: 0 0 1rem;
   font-size: 1.25rem;
-  color: rgba(0, 0, 0, 0.69);
+  color: ${props => props.theme.textColor};
 `;
 
 const ScriptDescription = styled.p`
   margin: 0 0 1rem;
   font-size: 1rem;
-  color: #222222;
+  color: ${props => props.theme.textColor};
 `;
 
 const CodePre = styled.pre`
@@ -243,6 +244,7 @@ export class Main extends Component {
   onDeleteScript = id => {
     const { scriptStore } = this.props;
     scriptStore.removeScript(id);
+    this.setState({ selectedScript: null });
   };
 
   onRunScript = id => {

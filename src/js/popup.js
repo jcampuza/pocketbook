@@ -14,6 +14,9 @@ import { NotificationContainer } from './components/ModalContainer';
 import { debugLog } from './util';
 import { ScriptStore } from './stores/ScriptStore';
 import { configure as configureMobx } from 'mobx';
+import { VERSION } from './lib/constants';
+import { AppThemeProvider } from './components/ThemeProvider';
+import { ThemeStore } from './stores/ThemeStore';
 
 const isDev = process.env.NODE_ENV === 'development';
 const mobxConfig = { enforceActions: isDev };
@@ -22,6 +25,7 @@ configureMobx(mobxConfig);
 const storage = new Storage(localStorage);
 const settingsStore = new SettingsStore(storage);
 const notificationStore = new NotificationStore();
+const themeStore = new ThemeStore(storage);
 const scriptStore = new ScriptStore(storage);
 
 const AppContainer = styled.div`
@@ -52,7 +56,8 @@ const AppNavigationContainer = styled.aside`
   flex-direction: column;
   flex: 0 0 8%;
   height: 100%;
-  background-color: rgb(232, 232, 232);
+  background-color: ${props => props.theme.navColor};
+  /* background-color: rgb(232, 232, 232); */
 `;
 
 const AppNavigation = styled.nav`
@@ -63,7 +68,7 @@ const AppNavigation = styled.nav`
 
 const NavLink = styled(Link)`
   padding: 1rem 0;
-  color: #000;
+  color: ${props => props.theme.textColor};
 `;
 
 const Core = () => (
@@ -71,27 +76,50 @@ const Core = () => (
     settingsStore={settingsStore}
     notificationStore={notificationStore}
     scriptStore={scriptStore}
+    themeStore={themeStore}
   >
-    <Router>
-      <AppContainer>
-        <AppNavigationContainer>
-          <AppNavigation>
-            <NavLink to="/">TODO</NavLink>
-            <NavLink to="/settings">TODO</NavLink>
-            <NavLink to="/about">TODO</NavLink>
-          </AppNavigation>
-        </AppNavigationContainer>
-        <Switch>
-          <Route exact path="/" component={Main} />
-          <Route path="/settings" component={Settings} />
-          <Route path="/about" component={About} />
-        </Switch>
+    <AppThemeProvider>
+      <Router>
+        <AppContainer>
+          <AppNavigationContainer>
+            <AppNavigation>
+              <NavLink to="/">TODO</NavLink>
+              <NavLink to="/settings">TODO</NavLink>
+              <NavLink to="/about">TODO</NavLink>
+            </AppNavigation>
+          </AppNavigationContainer>
+          <Switch>
+            <Route exact path="/" component={Main} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/about" component={About} />
+          </Switch>
 
-        <NotificationContainer />
-      </AppContainer>
-    </Router>
+          <NotificationContainer />
+        </AppContainer>
+      </Router>
+    </AppThemeProvider>
   </Provider>
 );
+
+(function checkForFirstRun() {
+  const version = storage.getItem('version');
+
+  if (version == null) {
+    debugLog('APPLICATION: first run');
+    notificationStore.addNotification({
+      title: 'Thanks for installing!',
+      message: 'Navigate to the about tab to learn more about pocketbook!',
+    });
+  } else if (parseFloat(version) < VERSION) {
+    debugLog('APPLICATION: update installed');
+    notificationStore.addNotification({
+      title: 'Pocketbook recently Updated!',
+      message: 'Check the changelog to view changes.',
+    });
+  }
+
+  storage.setItem('version', VERSION);
+})();
 
 debugLog('APPLICATION MOUNTING');
 render(<Core />, window.document.getElementById('app-container'));

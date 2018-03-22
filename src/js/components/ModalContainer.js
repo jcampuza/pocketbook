@@ -6,6 +6,7 @@ const AppModals = styled.div`
   position: absolute;
   right: 3%;
   top: 3%;
+  z-index: 9;
 `;
 
 const NotificationDiv = styled.div`
