@@ -9,4 +9,4 @@ export const Button = styled.button`
   height: 24px;
   min-width: 60px;
   cursor: pointer;
-`
+`;

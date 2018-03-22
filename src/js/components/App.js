@@ -1,14 +1,21 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Script } from "../models/script";
-import { injectScript } from "../lib/injectScript";
-import { CodeEditor } from "./CodeEditor";
-import { mockScripts } from "../mocks";
-import { AppSidebar } from "./AppSidebar";
-import { Button } from "./Button";
-import { createDefaultScript, guid, getLastSelectedScriptFromStorage, findById } from "../util";
+import { Script } from '../models/script';
+import { injectScript } from '../lib/injectScript';
+import { CodeEditor } from './CodeEditor';
+import { mockScripts } from '../mocks';
+import { AppSidebar } from './AppSidebar';
+import { Button } from '../ui/Button';
+import {
+  createDefaultScript,
+  guid,
+  getLastSelectedScriptFromStorage,
+  findById,
+} from '../util';
+import { TextInput } from '../ui/TextInput';
+import { TextArea } from '../ui/Textarea';
 
 const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
 const AppMainContainer = styled.main`
@@ -17,10 +24,7 @@ const AppMainContainer = styled.main`
   overflow-y: auto;
   transition: flex-basis 200ms ease-out;
 
-  flex-basis: ${props => props.fullWidth
-    ? '92%'
-    : '66%'
-  };
+  flex-basis: ${props => (props.fullWidth ? '92%' : '66%')};
 `;
 
 const NoneSelectedView = styled.div`
@@ -29,10 +33,10 @@ const NoneSelectedView = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
-`
+`;
 
 const ScriptContainer = styled.section`
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -40,19 +44,19 @@ const ScriptContainer = styled.section`
   > * + * {
     margin-top: 1rem;
   }
-`
+`;
 
 const ScriptTitle = styled.h3`
   margin: 0 0 1rem;
   font-size: 1.25rem;
   color: rgba(0, 0, 0, 0.69);
-`
+`;
 
 const ScriptDescription = styled.p`
   margin: 0 0 1rem;
   font-size: 1rem;
   color: #222222;
-`
+`;
 
 const CodePre = styled.pre`
   display: block;
@@ -61,7 +65,7 @@ const CodePre = styled.pre`
   width: 100%;
   background-color: #222222;
   color: #f1f1f1;
-  padding: .5rem;
+  padding: 0.5rem;
 `;
 
 const CodeCode = styled.code`
@@ -78,26 +82,8 @@ const ScriptActions = styled.div`
   margin-top: auto;
 
   > * + * {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
-`;
-
-const TextInput = styled.input.attrs({
-  type: 'text',
-})`
-  font-family: 'Roboto';
-  font-size: 14px;
-  padding: .5rem;
-  width: 50%;
-`;
-
-const TextArea = styled.textarea`
-  font-family: 'Roboto';
-  font-size: 14px;
-  padding: .5rem;
-  width: 50%;
-  min-width: 50%;
-  max-width: 50%;
 `;
 
 class EditScript extends Component {
@@ -106,12 +92,12 @@ class EditScript extends Component {
 
     this.state = {
       dirty: {
-        ...props.script
-      }
+        ...props.script,
+      },
     };
   }
 
-  updateField = (e) => {
+  updateField = e => {
     const { name, value } = e.target;
 
     const dirty = {
@@ -119,10 +105,10 @@ class EditScript extends Component {
       [name]: value,
     };
 
-    this.setState({ dirty })
-  }
+    this.setState({ dirty });
+  };
 
-  onEditorChange = (value) => {
+  onEditorChange = value => {
     const name = 'body';
 
     const dirty = {
@@ -131,37 +117,38 @@ class EditScript extends Component {
     };
 
     this.setState({ dirty });
-  }
+  };
 
   render() {
-    const {
-      title,
-      description,
-      body
-    } = this.state.dirty;
+    const { title, description, body } = this.state.dirty;
 
-    const {
-      onCancel,
-      onSubmit
-    } = this.props;
+    const { onCancel, onSubmit } = this.props;
 
     return (
       <ScriptContainer>
         <ScriptTitle>Editing: {title}</ScriptTitle>
 
-        <TextInput type="text" name="title" placeholder="title" value={title} onChange={this.updateField} />
-        <TextArea name="description" placeholder="description" value={description} onChange={this.updateField} />
-
-        <CodeEditor
-          onChange={this.onEditorChange}
-          value={body}
+        <TextInput
+          type="text"
+          name="title"
+          placeholder="title"
+          value={title}
+          onChange={this.updateField}
         />
+        <TextArea
+          name="description"
+          placeholder="description"
+          value={description}
+          onChange={this.updateField}
+        />
+
+        <CodeEditor onChange={this.onEditorChange} value={body} />
         <ScriptActions>
           <Button onClick={() => onSubmit(this.state.dirty)}>Save</Button>
           <Button onClick={() => onCancel()}>Cancel</Button>
         </ScriptActions>
       </ScriptContainer>
-    )
+    );
   }
 }
 
@@ -187,8 +174,8 @@ export default class extends Component {
     isEditing: false,
     mainViewExpanded: false,
     scripts,
-    selectedScript: getLastSelectedScriptFromStorage(scripts)
-  }
+    selectedScript: getLastSelectedScriptFromStorage(scripts),
+  };
 
   componentDidMount() {
     this.enableKeyboardShortCuts();
@@ -202,42 +189,42 @@ export default class extends Component {
   }
 
   toggleSidebar() {
-    this.setState({ mainViewExpanded: !this.state.mainViewExpanded })
+    this.setState({ mainViewExpanded: !this.state.mainViewExpanded });
   }
 
   syncWithStorage = () => {
     localStorage.setItem('scripts', JSON.stringify(this.state.scripts));
     console.log('SYNCED WITH STORAGE');
-  }
+  };
 
   toggleCreating = () => {
     this.setState({ isCreating: true });
-  }
+  };
 
   cancelEditing = () => {
     this.setState({ isEditing: false });
-  }
+  };
 
-  addScript = (script) => {
+  addScript = script => {
     this.setState({
       scripts: [...this.state.scripts, script],
       isCreating: false,
     });
-  }
+  };
 
-  onListItemClicked = (id) => {
+  onListItemClicked = id => {
     const { scripts } = this.state;
 
     const selectedScript = scripts.find(script => script.id === id);
     this.setState({ selectedScript });
 
     localStorage.setItem('last-selected', id);
-  }
+  };
 
-  onQuickActionClicked = (id) => {
+  onQuickActionClicked = id => {
     const scriptToRun = findById(this.state.scripts, id);
     if (scriptToRun) injectScript(scriptToRun.body);
-  }
+  };
 
   onAddItemClicked = () => {
     const scripts = this.state.scripts;
@@ -246,61 +233,69 @@ export default class extends Component {
 
     this.setState({
       scripts: [...scripts, newScript],
-      selectedScript: newScript
+      selectedScript: newScript,
     });
-  }
+  };
 
   toggleEditing = () => {
     this.setState({ isEditing: true });
-  }
+  };
 
-  onEditSubmit = (script) => {
-    const scripts = this.state.scripts.map(s => s.id === script.id ? script : s);
-    this.setState({
-      scripts,
-      isEditing: false,
-      selectedScript: scripts.find(s => s.id === script.id)
-    }, this.syncWithStorage);
-  }
+  onEditSubmit = script => {
+    const scripts = this.state.scripts.map(
+      s => (s.id === script.id ? script : s),
+    );
+    this.setState(
+      {
+        scripts,
+        isEditing: false,
+        selectedScript: scripts.find(s => s.id === script.id),
+      },
+      this.syncWithStorage,
+    );
+  };
 
-  onDeleteScript = (id) => {
+  onDeleteScript = id => {
     let { scripts } = this.state.scripts;
 
     scripts = this.state.scripts.filter(script => script.id !== id);
     this.setState({ scripts, selectedScript: null }, this.syncWithStorage);
-  }
+  };
 
-  onRunScript = (id) => {
+  onRunScript = id => {
     injectScript(this.state.scripts.find(script => script.id === id).body);
-  }
+  };
 
-  render () {
+  render() {
     const {
       isCreating,
       isEditing,
       selectedScript,
       scripts,
-      mainViewExpanded
+      mainViewExpanded,
     } = this.state;
 
     return (
       <React.Fragment>
         <AppMainContainer fullWidth={isEditing || mainViewExpanded}>
-          {selectedScript
-            ? isEditing
-              ? <EditScript
-                  script={selectedScript}
-                  onSubmit={this.onEditSubmit}
-                  onCancel={this.cancelEditing}
-                />
-              : <ScriptContent
-                  script={selectedScript}
-                  onRun={this.onRunScript}
-                  onEdit={this.toggleEditing}
-                  onDelete={this.onDeleteScript}
-                />
-            : <NoneSelectedView>No Script Selected</NoneSelectedView>
-          }
+          {selectedScript ? (
+            isEditing ? (
+              <EditScript
+                script={selectedScript}
+                onSubmit={this.onEditSubmit}
+                onCancel={this.cancelEditing}
+              />
+            ) : (
+              <ScriptContent
+                script={selectedScript}
+                onRun={this.onRunScript}
+                onEdit={this.toggleEditing}
+                onDelete={this.onDeleteScript}
+              />
+            )
+          ) : (
+            <NoneSelectedView>No Script Selected</NoneSelectedView>
+          )}
         </AppMainContainer>
         <AppSidebar
           onListItemClicked={this.onListItemClicked}

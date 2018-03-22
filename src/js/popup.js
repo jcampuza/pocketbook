@@ -1,20 +1,18 @@
-import React from "react";
-import { render } from "react-dom";
+import React from 'react';
+import { render } from 'react-dom';
 import styled from 'styled-components';
-import {
-  MemoryRouter as Router,
-  Route,
-  Switch
- } from 'react-router-dom';
+import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
 
 import '../css/popup.css';
 import { Link } from 'react-router-dom';
 import App from './components/App';
 import { Settings } from './components/Settings';
-import { SettingsStore } from "./stores/SettingsStore";
-import { Provider } from "mobx-react";
+import { SettingsStore } from './stores/SettingsStore';
+import { Provider } from 'mobx-react';
+import { Storage } from './lib/storage';
 
-const settingsStore = new SettingsStore();
+const storage = new Storage(localStorage);
+const settingsStore = new SettingsStore(storage);
 
 const AppContainer = styled.div`
   position: relative;
@@ -33,10 +31,10 @@ const Notification = styled.div`
   width: 200px;
   border: 1px solid #aaa;
   border-radius: 2px;
-  padding: .75rem;
+  padding: 0.75rem;
   width: 300px;
   background-color: #f3f3f3;
-  box-shadow: 0 1px 5px 0px rgba(0,0,0,0.33);
+  box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.33);
 `;
 
 const AppNavigationContainer = styled.aside`
@@ -77,9 +75,6 @@ const Core = () => (
       </AppContainer>
     </Router>
   </Provider>
-)
-
-render(
-  <Core />,
-  window.document.getElementById("app-container")
 );
+
+render(<Core />, window.document.getElementById('app-container'));

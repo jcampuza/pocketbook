@@ -1,75 +1,37 @@
-import { observable, action } from "mobx";
+import { observable, action, autorun } from 'mobx';
+import { themes, extensionThemes, editorThemes } from '../lib/constants';
 
-export const themes = {
-  primary: {},
-  dark: {}
-}
-
-export const extensionThemes = [
-  'dark',
-  'light'
-];
-
-export const editorThemes = [
-"ambiance",
-"chaos",
-"chrome",
-"clouds",
-"clouds_midnight",
-"cobalt",
-"crimson_editor",
-"dawn",
-"dreamweaver",
-"eclipse",
-"github",
-"idle_fingers",
-"iplastic",
-"katzenmilch",
-"kr_theme",
-"kuroir",
-"merbivore",
-"merbivore_soft",
-"mono_industrial",
-"monokai",
-"pastel_on_dark",
-"solarized_dark",
-"solarized_light",
-"sqlserver",
-"terminal",
-"textmate",
-"tomorrow",
-"tomorrow_night",
-"tomorrow_night_blue",
-"tomorrow_night_bright",
-"tomorrow_night_eighties",
-"twilight",
-"vibrant_ink",
-"xcods"
-];
+const THEME_KEY = 'settings:theme';
+const EDITOR_KEY = 'settings:editor';
 
 export class SettingsStore {
   @observable editorTheme;
   @observable theme;
 
-  constructor() {
-    const settings = JSON.parse(localStorage.getItem('settings'));
+  constructor(storage) {
+    this._storage = storage;
 
-    if (!settings) {
-      this.editorTheme = editorThemes[0];
-      this.theme = extensionThemes[0];
-    } else {
-      this.editorTheme = settings.editorTheme;
-      this.theme = settings.theme;
-    }
+    const userPrefs = this._storage.getItems(THEME_KEY, EDITOR_KEY);
+
+    this.theme = userPrefs[THEME_KEY] || extensionThemes[0];
+    this.editorTheme = userPrefs[EDITOR_KEY] || editorThemes[0];
+
+    // Whenever theme/editor are updated, set their values in storage
+    autorun(() => {
+      this._storage.setItems({
+        [THEME_KEY]: this.theme,
+        [EDITOR_KEY]: this.editorTheme,
+      });
+    });
   }
 
   @action
-  setEditorTheme = (value) => {
+  setEditorTheme = value => {
     this.editorTheme = value;
   };
 
   @action
-  setTheme = (value) => {
+  setTheme = value => {
     this.theme = value;
-  }
+  };
 }
