@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Script } from "../models/script";
@@ -7,24 +8,17 @@ import { CodeEditor } from "./CodeEditor";
 import { mockScripts } from "../mocks";
 import { AppSidebar } from "./AppSidebar";
 import { Button } from "./Button";
-import { createDefaultScript, guid, getLastSelectedScriptFromStorage } from "../util";
+import { createDefaultScript, guid, getLastSelectedScriptFromStorage, findById } from "../util";
 
 const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
-
-const AppContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  height: 400px;
-`;
-
 const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
   overflow-y: auto;
   transition: flex-basis 200ms ease-out;
 
-  flex-basis: ${props => props.fullWidth 
-    ? '100%'
+  flex-basis: ${props => props.fullWidth
+    ? '92%'
     : '66%'
   };
 `;
@@ -42,12 +36,16 @@ const ScriptContainer = styled.section`
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  > * + * {
+    margin-top: 1rem;
+  }
 `
 
 const ScriptTitle = styled.h3`
   margin: 0 0 1rem;
   font-size: 1.25rem;
-  color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.69);
 `
 
 const ScriptDescription = styled.p`
@@ -82,7 +80,25 @@ const ScriptActions = styled.div`
   > * + * {
     margin-left: .5rem;
   }
-`
+`;
+
+const TextInput = styled.input.attrs({
+  type: 'text',
+})`
+  font-family: 'Roboto';
+  font-size: 14px;
+  padding: .5rem;
+  width: 50%;
+`;
+
+const TextArea = styled.textarea`
+  font-family: 'Roboto';
+  font-size: 14px;
+  padding: .5rem;
+  width: 50%;
+  min-width: 50%;
+  max-width: 50%;
+`;
 
 class EditScript extends Component {
   constructor(props) {
@@ -90,25 +106,25 @@ class EditScript extends Component {
 
     this.state = {
       dirty: {
-        ...props.script 
+        ...props.script
       }
     };
   }
 
   updateField = (e) => {
     const { name, value } = e.target;
-    
+
     const dirty = {
       ...this.state.dirty,
       [name]: value,
     };
-    
+
     this.setState({ dirty })
   }
 
   onEditorChange = (value) => {
     const name = 'body';
-    
+
     const dirty = {
       ...this.state.dirty,
       [name]: value,
@@ -133,11 +149,11 @@ class EditScript extends Component {
       <ScriptContainer>
         <ScriptTitle>Editing: {title}</ScriptTitle>
 
-        <input name="title" placeholder="title" value={title} onChange={this.updateField} />
-        <textarea name="description" placeholder="description" value={description} onChange={this.updateField} />
+        <TextInput type="text" name="title" placeholder="title" value={title} onChange={this.updateField} />
+        <TextArea name="description" placeholder="description" value={description} onChange={this.updateField} />
 
-        <CodeEditor 
-          onChange={this.onEditorChange} 
+        <CodeEditor
+          onChange={this.onEditorChange}
           value={body}
         />
         <ScriptActions>
@@ -155,7 +171,6 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
       <ScriptTitle>{script.title}</ScriptTitle>
       <ScriptDescription>{script.description}</ScriptDescription>
       <CodeEditor value={script.body} readOnly={true} />
-      {/* <CodeDisplay>{script.body}</CodeDisplay> */}
 
       <ScriptActions>
         <Button onClick={() => onRun(script.id)}>Run</Button>
@@ -173,6 +188,21 @@ export default class extends Component {
     mainViewExpanded: false,
     scripts,
     selectedScript: getLastSelectedScriptFromStorage(scripts)
+  }
+
+  componentDidMount() {
+    this.enableKeyboardShortCuts();
+  }
+
+  enableKeyboardShortCuts() {
+    document.addEventListener('keydown', event => {
+      if (event.key === 'b' && event.metaKey === true) this.toggleSidebar();
+      if (event.key === 'e' && event.metaKey === true) this.toggleEditing();
+    });
+  }
+
+  toggleSidebar() {
+    this.setState({ mainViewExpanded: !this.state.mainViewExpanded })
   }
 
   syncWithStorage = () => {
@@ -204,6 +234,11 @@ export default class extends Component {
     localStorage.setItem('last-selected', id);
   }
 
+  onQuickActionClicked = (id) => {
+    const scriptToRun = findById(this.state.scripts, id);
+    if (scriptToRun) injectScript(scriptToRun.body);
+  }
+
   onAddItemClicked = () => {
     const scripts = this.state.scripts;
     const newScript = createDefaultScript();
@@ -215,7 +250,7 @@ export default class extends Component {
     });
   }
 
-  onEditScript = () => {
+  toggleEditing = () => {
     this.setState({ isEditing: true });
   }
 
@@ -232,7 +267,7 @@ export default class extends Component {
     let { scripts } = this.state.scripts;
 
     scripts = this.state.scripts.filter(script => script.id !== id);
-    this.setState({ scripts, selectedScript: null });
+    this.setState({ scripts, selectedScript: null }, this.syncWithStorage);
   }
 
   onRunScript = (id) => {
@@ -249,8 +284,8 @@ export default class extends Component {
     } = this.state;
 
     return (
-      <AppContainer>
-        <AppMainContainer fullWidth={isEditing}>
+      <React.Fragment>
+        <AppMainContainer fullWidth={isEditing || mainViewExpanded}>
           {selectedScript
             ? isEditing
               ? <EditScript
@@ -261,18 +296,19 @@ export default class extends Component {
               : <ScriptContent
                   script={selectedScript}
                   onRun={this.onRunScript}
-                  onEdit={this.onEditScript}
+                  onEdit={this.toggleEditing}
                   onDelete={this.onDeleteScript}
                 />
             : <NoneSelectedView>No Script Selected</NoneSelectedView>
           }
         </AppMainContainer>
-        <AppSidebar 
+        <AppSidebar
           onListItemClicked={this.onListItemClicked}
           onAddItemClicked={this.onAddItemClicked}
+          onQuickActionClicked={this.onQuickActionClicked}
           scripts={scripts}
         />
-      </AppContainer>
+      </React.Fragment>
     );
   }
 }

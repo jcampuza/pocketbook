@@ -1,9 +1,9 @@
 export function createDefaultScript() {
   return {
     id: guid(),
-    title: 'New Script',
-    description: 'A newly generate script',
-    body: 'function () {}'
+    title: 'Hello World',
+    description: 'Default Generated Hello World Script',
+    body: '(function() { console.log("hello world")})()'
   }
 }
 
@@ -17,4 +17,8 @@ export function getLastSelectedScriptFromStorage(scripts) {
   const lastSelectedId = localStorage.getItem('last-selected');
 
   return scripts.find(script => script.id === lastSelectedId);
+}
+
+export function findById(list, id) {
+  return list.find(listItem => listItem.id === id);
 }
