@@ -5,14 +5,18 @@ export const themes = {
     sidebarColor: 'rgb(245,245,245)',
     textColor: '#222222',
     listItemOddColor: '#dedede',
+    listItemActiveColor: '#ffffff',
+    iconColor: 'rgb(35, 35, 35)',
   },
   dark: {
-    primaryColor: '#292929',
-    navColor: '#2d2d2a',
-    sidebarColor: 'rgb(245,245,245)',
+    primaryColor: 'rgb(18, 18, 18)',
+    navColor: 'rgb(35, 35, 35)',
+    sidebarColor: 'rgb(35,35,35)',
     textColor: '#FAFAFA',
     secondaryTextColor: '#DEDEDE',
-    listItemOddColor: '#dedede',
+    listItemOddColor: 'rgb(18, 18, 18)',
+    listItemActiveColor: 'rgb(71, 71, 71)',
+    iconColor: '#DEDEDE',
   },
 };
 

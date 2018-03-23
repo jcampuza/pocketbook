@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import brace from 'brace';
 import AceEditor from 'react-ace';
 import { inject, observer } from 'mobx-react';
-import { editorThemes } from '../lib/constants';
+import { editorThemes } from '../util/constants';
 
 // Available Themes
 import 'brace/mode/javascript';
@@ -41,11 +41,13 @@ import 'brace/theme/twilight';
 import 'brace/theme/vibrant_ink';
 import 'brace/theme/xcode';
 
-export const CodeEditor = inject('settingsStore')(
-  observer(({ onChange, value, readOnly = false, settingsStore }) => (
+export const CodeEditor = inject(stores => ({
+  editorTheme: stores.settingsStore.editorTheme,
+}))(
+  observer(({ onChange, value, readOnly = false, editorTheme }) => (
     <AceEditor
       style={{ margin: '1rem 0' }}
-      theme={settingsStore.editorTheme}
+      theme={editorTheme}
       mode="javascript"
       name="editor"
       onChange={onChange}

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { observer, inject } from 'mobx-react';
 
-import { Script } from '../models/script';
-import { injectScript } from '../lib/injectScript';
+import { injectScript } from '../util/injectScript';
 import { CodeEditor } from '../components/CodeEditor';
 import { mockScripts } from '../mocks';
 import { AppSidebar } from '../components/AppSidebar';
@@ -16,9 +16,9 @@ import {
 } from '../util';
 import { TextInput } from '../ui/TextInput';
 import { TextArea } from '../ui/Textarea';
-import { observer, inject } from 'mobx-react';
 
 const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
+
 const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
@@ -59,26 +59,6 @@ const ScriptDescription = styled.p`
   font-size: 1rem;
   color: ${props => props.theme.textColor};
 `;
-
-const CodePre = styled.pre`
-  display: block;
-  overflow-x: auto;
-  border-radius: 2px;
-  width: 100%;
-  background-color: #222222;
-  color: #f1f1f1;
-  padding: 0.5rem;
-`;
-
-const CodeCode = styled.code`
-  font-family: monospace;
-`;
-
-const CodeDisplay = ({ children }) => (
-  <CodePre>
-    <CodeCode>{children}</CodeCode>
-  </CodePre>
-);
 
 const ScriptActions = styled.div`
   margin-top: auto;
@@ -170,27 +150,40 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   </React.Fragment>
 );
 
-@inject('scriptStore', 'notificationStore')
+@inject(stores => ({
+  scripts: stores.scriptStore.scripts,
+  filteredScripts: stores.scriptStore.filtered,
+  addScript: stores.scriptStore.addScript,
+  editScript: stores.scriptStore.editScript,
+  removeScript: stores.scriptStore.removeScript,
+  filterScripts: stores.scriptStore.filter,
+}))
 @observer
 export class Main extends Component {
-  state = {
-    isCreating: false,
-    isEditing: false,
-    mainViewExpanded: false,
-    scripts,
-    selectedScript: getLastSelectedScriptFromStorage(scripts),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isCreating: false,
+      isEditing: false,
+      mainViewExpanded: false,
+      selectedScript: getLastSelectedScriptFromStorage(props.scripts),
+      searchQuery: '',
+    };
+  }
 
   componentDidMount() {
-    this.enableKeyboardShortCuts();
+    document.addEventListener('keydown', this.handleKeyboardShortcuts);
   }
 
-  enableKeyboardShortCuts() {
-    document.addEventListener('keydown', event => {
-      if (event.key === 'b' && event.metaKey === true) this.toggleSidebar();
-      if (event.key === 'e' && event.metaKey === true) this.toggleEditing();
-    });
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyboardShortcuts);
   }
+
+  handleKeyboardShortcuts = event => {
+    if (event.key === 'b' && event.metaKey === true) this.toggleSidebar();
+    if (event.key === 'e' && event.metaKey === true) this.toggleEditing();
+  };
 
   toggleSidebar() {
     this.setState({ mainViewExpanded: !this.state.mainViewExpanded });
@@ -205,24 +198,20 @@ export class Main extends Component {
   };
 
   onListItemClicked = id => {
-    const { scriptStore } = this.props;
-    // const { scripts } = this.state;
-
-    const selectedScript = scriptStore.scripts.find(script => script.id === id);
+    const selectedScript = this.props.scripts.find(script => script.id === id);
     this.setState({ selectedScript });
 
     localStorage.setItem('last-selected', id);
   };
 
   onQuickActionClicked = id => {
-    const scriptToRun = findById(this.state.scripts, id);
+    const scriptToRun = findById(this.props.scripts, id);
     if (scriptToRun) injectScript(scriptToRun.body);
   };
 
   onAddItemClicked = () => {
-    const { scriptStore } = this.props;
     const newScript = createDefaultScript();
-    scriptStore.addScript(newScript);
+    this.props.addScript(newScript);
 
     this.setState({ selectedScript: newScript });
   };
@@ -232,9 +221,7 @@ export class Main extends Component {
   };
 
   onEditSubmit = script => {
-    const { scriptStore } = this.props;
-
-    scriptStore.editScript(script);
+    this.props.editScript(script);
     this.setState({
       isEditing: false,
       selectedScript: script,
@@ -242,13 +229,18 @@ export class Main extends Component {
   };
 
   onDeleteScript = id => {
-    const { scriptStore } = this.props;
-    scriptStore.removeScript(id);
+    this.props.removeScript(id);
     this.setState({ selectedScript: null });
   };
 
   onRunScript = id => {
-    injectScript(this.state.scripts.find(script => script.id === id).body);
+    injectScript(this.props.scripts.find(script => script.id === id).body);
+  };
+
+  onSearchFilterChanged = e => {
+    const value = e.target.value;
+    this.props.filterScripts(value);
+    this.setState({ searchQuery: value });
   };
 
   render() {
@@ -259,7 +251,9 @@ export class Main extends Component {
       mainViewExpanded,
     } = this.state;
 
-    const { scripts } = this.props.scriptStore;
+    const scripts = this.props.filteredScripts.query
+      ? this.props.filteredScripts.result
+      : this.props.scripts;
 
     return (
       <React.Fragment>
@@ -287,6 +281,7 @@ export class Main extends Component {
           onListItemClicked={this.onListItemClicked}
           onAddItemClicked={this.onAddItemClicked}
           onQuickActionClicked={this.onQuickActionClicked}
+          onSearchFilterChanged={this.onSearchFilterChanged}
           scripts={scripts}
         />
       </React.Fragment>

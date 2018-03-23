@@ -8,15 +8,16 @@ import { Link } from 'react-router-dom';
 import { Main, About, Settings } from './routes';
 import { SettingsStore } from './stores/SettingsStore';
 import { Provider } from 'mobx-react';
-import { Storage } from './lib/storage';
+import { Storage } from './util/storage';
 import { NotificationStore } from './stores/NotificationStore';
 import { NotificationContainer } from './components/ModalContainer';
 import { debugLog } from './util';
 import { ScriptStore } from './stores/ScriptStore';
 import { configure as configureMobx } from 'mobx';
-import { VERSION } from './lib/constants';
+import { VERSION } from './util/constants';
 import { AppThemeProvider } from './components/ThemeProvider';
 import { ThemeStore } from './stores/ThemeStore';
+import { ScriptIcon, SettingsIcon, AboutIcon } from './ui/Icons';
 
 const isDev = process.env.NODE_ENV === 'development';
 const mobxConfig = { enforceActions: isDev };
@@ -57,10 +58,10 @@ const AppNavigationContainer = styled.aside`
   flex: 0 0 8%;
   height: 100%;
   background-color: ${props => props.theme.navColor};
-  /* background-color: rgb(232, 232, 232); */
 `;
 
 const AppNavigation = styled.nav`
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,9 +84,15 @@ const Core = () => (
         <AppContainer>
           <AppNavigationContainer>
             <AppNavigation>
-              <NavLink to="/">TODO</NavLink>
-              <NavLink to="/settings">TODO</NavLink>
-              <NavLink to="/about">TODO</NavLink>
+              <NavLink to="/">
+                <ScriptIcon />
+              </NavLink>
+              <NavLink to="/settings">
+                <SettingsIcon />
+              </NavLink>
+              <NavLink style={{ marginTop: 'auto' }} to="/about">
+                <AboutIcon />
+              </NavLink>
             </AppNavigation>
           </AppNavigationContainer>
           <Switch>

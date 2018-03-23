@@ -31,3 +31,27 @@ export function debugLog(msg, level = 'log') {
     console[level](msg);
   }
 }
+
+export function blacklist(src, ...args) {
+  const copy = {};
+
+  for (const key in src) {
+    if (args.indexOf(key) === -1) {
+      copy[key] = src[key];
+    }
+  }
+
+  return copy;
+}
+
+export function pick(src, ...args) {
+  const copy = {};
+
+  for (const key in src) {
+    if (args.indexOf(key) >= 0) {
+      copy[key] = src[key];
+    }
+  }
+
+  return copy;
+}

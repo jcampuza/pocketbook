@@ -1,5 +1,5 @@
 import { observable, autorun, computed, action } from 'mobx';
-import { themes } from '../lib/themes';
+import { themes } from '../util/themes';
 
 export class ThemeStore {
   @observable currentTheme;

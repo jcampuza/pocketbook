@@ -1,5 +1,5 @@
 import { observable, action, autorun } from 'mobx';
-import { themes, extensionThemes, editorThemes } from '../lib/constants';
+import { themes, extensionThemes, editorThemes } from '../util/constants';
 
 const THEME_KEY = 'settings:theme';
 const EDITOR_KEY = 'settings:editor';
@@ -25,12 +25,12 @@ export class SettingsStore {
     });
   }
 
-  @action
+  @action.bound
   setEditorTheme = value => {
     this.editorTheme = value;
   };
 
-  @action
+  @action.bound
   setTheme = value => {
     this.theme = value;
   };

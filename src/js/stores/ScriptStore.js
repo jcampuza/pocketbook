@@ -4,6 +4,11 @@ import { guid } from '../util';
 
 export class ScriptStore {
   @observable scripts = [];
+  @observable
+  filtered = {
+    query: '',
+    result: [],
+  };
 
   constructor(storage) {
     this._storage = storage;
@@ -36,6 +41,22 @@ export class ScriptStore {
     if (idx) {
       this.scripts.splice(idx, 1, script);
     }
+  }
+
+  @action.bound
+  filter(query = '') {
+    query = query.toLowerCase();
+    const result = this.scripts.filter(script => {
+      return (
+        script.title.toLowerCase().includes(query) ||
+        script.body.toLowerCase().includes(query)
+      );
+    });
+
+    this.filtered = {
+      query,
+      result,
+    };
   }
 
   @action.bound

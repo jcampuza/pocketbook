@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { observer, inject } from 'mobx-react';
-import { editorThemes, extensionThemes } from '../lib/constants';
+import { editorThemes, extensionThemes } from '../util/constants';
 import { Button, ButtonContainer } from '../ui/Button';
 import { TextArea } from '../ui/Textarea';
 
@@ -43,7 +43,15 @@ const SelectLabel = styled.label`
 const OptionList = ({ options }) =>
   options.map(option => <option value={option.value}>{option.label}</option>);
 
-@inject('settingsStore', 'scriptStore', 'notificationStore', 'themeStore')
+@inject(stores => ({
+  editorTheme: stores.settingsStore.editorTheme,
+  setEditorTheme: stores.settingsStore.setEditorTheme,
+  bulkImport: stores.scriptStore.bulkImport,
+  scripts: stores.scriptStore.scripts,
+  addNotification: stores.notificationStore.addNotification,
+  currentTheme: stores.themeStore.currentTheme,
+  setTheme: stores.themeStore.setTheme,
+}))
 @observer
 export class Settings extends Component {
   state = {
@@ -53,12 +61,11 @@ export class Settings extends Component {
 
   onEditorThemeChanged = e => {
     const value = e.target.value;
-    this.props.settingsStore.setEditorTheme(value);
+    this.props.setEditorTheme(value);
   };
 
   onExportClicked = () => {
-    const { scriptStore } = this.props;
-    const generatedExport = JSON.stringify(scriptStore.scripts);
+    const generatedExport = JSON.stringify(this.props.scripts);
     this.setState({ isExporting: true, generatedExport });
   };
 
@@ -72,17 +79,17 @@ export class Settings extends Component {
   };
 
   submitImport = () => {
-    const { scriptStore, notificationStore } = this.props;
     const { importText } = this.state;
+    const { addNotification, bulkImport } = this.props;
 
     try {
-      scriptStore.bulkImport(importText);
-      notificationStore.addNotification({
+      bulkImport(importText);
+      addNotification({
         title: 'Successfully imported scripts!',
         message: 'You can view them in the main tab now.',
       });
     } catch (err) {
-      notificationStore.addNotification({
+      addNotification({
         title: 'Failed to import scripts.',
         message: err.message,
         type: 'error',
@@ -93,7 +100,6 @@ export class Settings extends Component {
   };
 
   render() {
-    const { settingsStore, themeStore } = this.props;
     const {
       importText,
       isImporting,
@@ -101,14 +107,13 @@ export class Settings extends Component {
       generatedExport,
     } = this.state;
 
+    const { editorTheme, setTheme, currentTheme } = this.props;
+
     return (
       <SettingsContainer>
         <FormInput>
           <SelectLabel>Editor Theme</SelectLabel>
-          <SelectInput
-            value={settingsStore.editorTheme}
-            onChange={this.onEditorThemeChanged}
-          >
+          <SelectInput value={editorTheme} onChange={this.onEditorThemeChanged}>
             <OptionList
               options={editorThemes.map(theme => ({
                 value: theme,
@@ -121,8 +126,8 @@ export class Settings extends Component {
         <FormInput>
           <SelectLabel>Extension Theme</SelectLabel>
           <SelectInput
-            value={themeStore.currentTheme}
-            onChange={e => themeStore.setTheme(e.target.value)}
+            value={currentTheme}
+            onChange={e => setTheme(e.target.value)}
           >
             <OptionList
               options={extensionThemes.map(theme => ({

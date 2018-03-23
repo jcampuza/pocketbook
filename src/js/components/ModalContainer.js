@@ -39,11 +39,13 @@ export function Notification({ title, message, type }) {
   );
 }
 
-@inject('notificationStore')
+@inject(stores => ({
+  notifications: stores.notificationStore.notifications,
+}))
 @observer
 export class NotificationContainer extends Component {
   renderNotifications() {
-    const { notifications } = this.props.notificationStore;
+    const { notifications } = this.props;
 
     return (
       <AppModals>
@@ -60,7 +62,7 @@ export class NotificationContainer extends Component {
   }
 
   render() {
-    const { notifications } = this.props.notificationStore;
+    const { notifications } = this.props;
 
     if (!notifications.length) {
       return null;
