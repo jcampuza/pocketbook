@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { observer, inject } from 'mobx-react';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
+
+const duration = 1000;
 
 const AppModals = styled.div`
   position: absolute;
@@ -30,44 +33,57 @@ const NotificationBody = styled.p`
   font-size: 1rem;
 `;
 
-export function Notification({ title, message, type }) {
+const NotificationClose = styled.p`
+  font-size: 0.8rem;
+  color: '#999';
+  margin: 1rem 0 0;
+  cursor: pointer;
+`;
+
+export function Fade({ children, ...props }) {
+  return (
+    <CSSTransition {...props} timeout={duration} classNames="notification">
+      {children}
+    </CSSTransition>
+  );
+}
+
+export function Notification({ title, message, type, onRemove }) {
   return (
     <NotificationDiv>
       <NotificationTitle type={type}>{title}</NotificationTitle>
       {message && <NotificationBody>{message}</NotificationBody>}
+
+      <NotificationClose onClick={onRemove}>close</NotificationClose>
     </NotificationDiv>
   );
 }
 
 @inject(stores => ({
   notifications: stores.notificationStore.notifications,
+  removeNotification: stores.notificationStore.removeNotification,
 }))
 @observer
 export class NotificationContainer extends Component {
-  renderNotifications() {
-    const { notifications } = this.props;
-
+  render() {
+    const { notifications, removeNotification } = this.props;
+    console.log(notifications.length);
     return (
       <AppModals>
-        {notifications.map(n => (
-          <Notification
-            title={n.title}
-            message={n.message}
-            type={n.type}
-            key={n.id}
-          />
-        ))}
+        <TransitionGroup className="notification">
+          {notifications.map(n => (
+            <Fade key={n}>
+              <Notification
+                title={n.title}
+                message={n.message}
+                type={n.type}
+                key={n.id}
+                onRemove={() => removeNotification(n.id)}
+              />
+            </Fade>
+          ))}
+        </TransitionGroup>
       </AppModals>
     );
-  }
-
-  render() {
-    const { notifications } = this.props;
-
-    if (!notifications.length) {
-      return null;
-    }
-
-    return this.renderNotifications();
   }
 }

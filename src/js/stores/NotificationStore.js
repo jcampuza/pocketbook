@@ -28,6 +28,7 @@ export class NotificationStore {
       clearTimeout(notification.timer);
       this.notifications.remove(notification);
     }
+    console.log('removed notification', notificationId);
   }
 
   @action.bound

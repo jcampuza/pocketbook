@@ -108,25 +108,31 @@ const Core = () => (
   </Provider>
 );
 
+debugLog('APPLICATION MOUNTING');
+render(<Core />, window.document.getElementById('app-container'));
+
 (function checkForFirstRun() {
   const version = storage.getItem('version');
 
   if (version == null) {
     debugLog('APPLICATION: first run');
-    notificationStore.addNotification({
-      title: 'Thanks for installing!',
-      message: 'Navigate to the about tab to learn more about pocketbook!',
-    });
+    notificationStore.addNotification(
+      {
+        title: 'Thanks for installing!',
+        message: 'Navigate to the about tab to learn more about pocketbook!',
+      },
+      8000,
+    );
   } else if (parseFloat(version) < VERSION) {
     debugLog('APPLICATION: update installed');
-    notificationStore.addNotification({
-      title: 'Pocketbook recently Updated!',
-      message: 'Check the changelog to view changes.',
-    });
+    notificationStore.addNotification(
+      {
+        title: 'Pocketbook recently Updated!',
+        message: 'Check the changelog to view changes.',
+      },
+      8000,
+    );
   }
 
   storage.setItem('version', VERSION);
 })();
-
-debugLog('APPLICATION MOUNTING');
-render(<Core />, window.document.getElementById('app-container'));
