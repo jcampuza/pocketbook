@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { observer, inject } from 'mobx-react';
-import { editorThemes, extensionThemes } from '../util/constants';
+import { editorThemes, extensionThemes } from '../util/themes';
 import { Button, ButtonContainer } from '../ui/Button';
 import { TextArea } from '../ui/Textarea';
 

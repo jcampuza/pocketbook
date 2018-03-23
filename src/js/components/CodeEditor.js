@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import brace from 'brace';
 import AceEditor from 'react-ace';
 import { inject, observer } from 'mobx-react';
-import { editorThemes } from '../util/constants';
+import { editorThemes } from '../util/themes';
 
 // Available Themes
 import 'brace/mode/javascript';

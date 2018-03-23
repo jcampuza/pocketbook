@@ -1,5 +1,5 @@
 import { observable, action, autorun } from 'mobx';
-import { themes, extensionThemes, editorThemes } from '../util/constants';
+import { themes, extensionThemes, editorThemes } from '../util/themes';
 
 const THEME_KEY = 'settings:theme';
 const EDITOR_KEY = 'settings:editor';
