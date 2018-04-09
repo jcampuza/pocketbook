@@ -5,6 +5,26 @@ import { editorThemes, extensionThemes } from '../util/themes';
 import { Button, ButtonContainer } from '../ui/Button';
 import { TextArea } from '../ui/Textarea';
 
+const CheckboxLabel = styled.label`
+  > * + * {
+    margin-left: 1rem;
+  }
+`;
+
+const CheckboxInput = ({ label, value, checked, onChange }) => (
+  <p>
+    <CheckboxLabel>
+      <span>{label}</span>
+      <input
+        type="checkbox"
+        value={value}
+        checked={checked}
+        onChange={onChange}
+      />
+    </CheckboxLabel>
+  </p>
+);
+
 const SettingsContainer = styled.div`
   position: relative;
   flex: 1 0 92%;
@@ -46,6 +66,8 @@ const OptionList = ({ options }) =>
 @inject(stores => ({
   editorTheme: stores.settingsStore.editorTheme,
   setEditorTheme: stores.settingsStore.setEditorTheme,
+  isCompactModeEnabled: stores.settingsStore.isCompactModeEnabled,
+  setCompactMode: stores.settingsStore.setCompactMode,
   bulkImport: stores.scriptStore.bulkImport,
   scripts: stores.scriptStore.scripts,
   addNotification: stores.notificationStore.addNotification,
@@ -62,6 +84,11 @@ export class Settings extends Component {
   onEditorThemeChanged = e => {
     const value = e.target.value;
     this.props.setEditorTheme(value);
+  };
+
+  onCompactModeClicked = e => {
+    const value = e.target.checked;
+    this.props.setCompactMode(value);
   };
 
   onExportClicked = () => {
@@ -107,7 +134,12 @@ export class Settings extends Component {
       generatedExport,
     } = this.state;
 
-    const { editorTheme, setTheme, currentTheme } = this.props;
+    const {
+      editorTheme,
+      setTheme,
+      currentTheme,
+      isCompactModeEnabled,
+    } = this.props;
 
     return (
       <SettingsContainer>
@@ -137,6 +169,12 @@ export class Settings extends Component {
             />
           </SelectInput>
         </FormInput>
+
+        <CheckboxInput
+          checked={isCompactModeEnabled}
+          onChange={this.onCompactModeClicked}
+          label="Open in compact mode"
+        />
 
         <ButtonContainer>
           <Button onClick={this.onExportClicked}>Export Scripts</Button>

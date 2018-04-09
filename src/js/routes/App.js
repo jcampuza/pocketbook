@@ -157,6 +157,7 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   editScript: stores.scriptStore.editScript,
   removeScript: stores.scriptStore.removeScript,
   filterScripts: stores.scriptStore.filter,
+  isCompactMode: stores.settingsStore.isCompactModeEnabled,
 }))
 @observer
 export class Main extends Component {
@@ -251,32 +252,39 @@ export class Main extends Component {
       mainViewExpanded,
     } = this.state;
 
+    const { isCompactMode } = this.props;
+
+    console.log(isCompactMode);
+
     const scripts = this.props.filteredScripts.query
       ? this.props.filteredScripts.result
       : this.props.scripts;
 
     return (
       <React.Fragment>
-        <AppMainContainer fullWidth={isEditing || mainViewExpanded}>
-          {selectedScript ? (
-            isEditing ? (
-              <EditScript
-                script={selectedScript}
-                onSubmit={this.onEditSubmit}
-                onCancel={this.cancelEditing}
-              />
+        {!isCompactMode && (
+          <AppMainContainer fullWidth={isEditing || mainViewExpanded}>
+            {selectedScript ? (
+              isEditing ? (
+                <EditScript
+                  script={selectedScript}
+                  onSubmit={this.onEditSubmit}
+                  onCancel={this.cancelEditing}
+                />
+              ) : (
+                <ScriptContent
+                  script={selectedScript}
+                  onRun={this.onRunScript}
+                  onEdit={this.toggleEditing}
+                  onDelete={this.onDeleteScript}
+                />
+              )
             ) : (
-              <ScriptContent
-                script={selectedScript}
-                onRun={this.onRunScript}
-                onEdit={this.toggleEditing}
-                onDelete={this.onDeleteScript}
-              />
-            )
-          ) : (
-            <NoneSelectedView>No Script Selected</NoneSelectedView>
-          )}
-        </AppMainContainer>
+              <NoneSelectedView>No Script Selected</NoneSelectedView>
+            )}
+          </AppMainContainer>
+        )}
+
         <AppSidebar
           onListItemClicked={this.onListItemClicked}
           onAddItemClicked={this.onAddItemClicked}

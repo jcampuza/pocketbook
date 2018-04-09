@@ -1,6 +1,10 @@
 {
-  "name": "Script Executor",
+  "name": "Pocketbook",
   "options_page": "options.html",
+  "short_name": "Pocketbook",
+  "version": "0.1",
+  "description": "A developer extension to store and run console scripts",
+  "author": "Joseph Campuzano",
   "background": {
     "page": "background.html"
   },
@@ -12,9 +16,7 @@
     "128": "icon-128.png"
   },
   "manifest_version": 2,
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "permissions": [
-    "tabs",
-    "<all_urls>"
-  ]
+  "content_security_policy":
+    "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "permissions": ["tabs", "<all_urls>"]
 }

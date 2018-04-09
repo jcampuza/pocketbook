@@ -2,3 +2,5 @@ node_modules
 build
 secrets.*.js
 yarn-error.log
+.DS_Store
+build.*

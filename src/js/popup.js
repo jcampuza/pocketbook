@@ -1,13 +1,18 @@
 import React from 'react';
 import { render } from 'react-dom';
 import styled from 'styled-components';
-import { MemoryRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  MemoryRouter as Router,
+  Route,
+  Switch,
+  withRouter,
+} from 'react-router-dom';
 
 import '../css/popup.css';
 import { Link } from 'react-router-dom';
 import { Main, About, Settings } from './routes';
 import { SettingsStore } from './stores/SettingsStore';
-import { Provider } from 'mobx-react';
+import { Provider, inject, observer } from 'mobx-react';
 import { Storage } from './util/storage';
 import { NotificationStore } from './stores/NotificationStore';
 import { NotificationContainer } from './components/ModalContainer';
@@ -33,8 +38,19 @@ const AppContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: row;
-  height: 500px;
+  width: ${({ compact }) => (compact ? '' : '800px')};
+  height: ${({ compact }) => (compact ? '250px' : '500px')};
 `;
+
+const Container = withRouter(
+  inject(stores => ({
+    isCompactModeEnabled: stores.settingsStore.isCompactModeEnabled,
+  }))(
+    observer(({ children, isCompactModeEnabled }) => (
+      <AppContainer compact={isCompactModeEnabled}>{children}</AppContainer>
+    )),
+  ),
+);
 
 const AppModals = styled.div`
   position: absolute;
@@ -57,6 +73,7 @@ const AppNavigationContainer = styled.aside`
   flex-direction: column;
   flex: 0 0 8%;
   height: 100%;
+  min-width: 50px;
   background-color: ${props => props.theme.navColor};
 `;
 
@@ -72,6 +89,14 @@ const NavLink = styled(Link)`
   color: ${props => props.theme.textColor};
 `;
 
+const ExpandButton = styled.button`
+  min-width: 75px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+`;
+
 const Core = () => (
   <Provider
     settingsStore={settingsStore}
@@ -81,7 +106,7 @@ const Core = () => (
   >
     <AppThemeProvider>
       <Router>
-        <AppContainer>
+        <Container>
           <AppNavigationContainer>
             <AppNavigation>
               <NavLink to="/">
@@ -93,6 +118,13 @@ const Core = () => (
               <NavLink style={{ marginTop: 'auto' }} to="/about">
                 <AboutIcon />
               </NavLink>
+              {settingsStore.isCompactModeEnabled && (
+                <ExpandButton
+                  onClick={() => settingsStore.setCompactMode(false)}
+                >
+                  Expand
+                </ExpandButton>
+              )}
             </AppNavigation>
           </AppNavigationContainer>
           <Switch>
@@ -102,7 +134,7 @@ const Core = () => (
           </Switch>
 
           <NotificationContainer />
-        </AppContainer>
+        </Container>
       </Router>
     </AppThemeProvider>
   </Provider>
