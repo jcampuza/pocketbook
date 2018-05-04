@@ -157,12 +157,14 @@ const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   editScript: stores.scriptStore.editScript,
   removeScript: stores.scriptStore.removeScript,
   filterScripts: stores.scriptStore.filter,
-  isCompactMode: stores.settingsStore.isCompactModeEnabled,
+  isCompactMode: stores.settingsStore.isCompactMode,
 }))
 @observer
 export class Main extends Component {
   constructor(props) {
     super(props);
+
+    const openInCompactMode = !!props.isCompactMode;
 
     this.state = {
       isCreating: false,
@@ -253,8 +255,6 @@ export class Main extends Component {
     } = this.state;
 
     const { isCompactMode } = this.props;
-
-    console.log(isCompactMode);
 
     const scripts = this.props.filteredScripts.query
       ? this.props.filteredScripts.result

@@ -170,12 +170,6 @@ export class Settings extends Component {
           </SelectInput>
         </FormInput>
 
-        <CheckboxInput
-          checked={isCompactModeEnabled}
-          onChange={this.onCompactModeClicked}
-          label="Open in compact mode"
-        />
-
         <ButtonContainer>
           <Button onClick={this.onExportClicked}>Export Scripts</Button>
           <Button onClick={this.onImportClicked}>Import Scripts</Button>

@@ -8,6 +8,7 @@ const COMPACT_MODE_KEY = 'settings:compact';
 export class SettingsStore {
   @observable editorTheme;
   @observable theme;
+  @observable isCompactMode;
   @observable isCompactModeEnabled;
 
   constructor(storage) {
@@ -22,6 +23,7 @@ export class SettingsStore {
     this.theme = userPrefs[THEME_KEY] || extensionThemes[0];
     this.editorTheme = userPrefs[EDITOR_KEY] || editorThemes[0];
     this.isCompactModeEnabled = userPrefs[COMPACT_MODE_KEY] === 'true' || false;
+    this.isCompactMode = userPrefs[COMPACT_MODE_KEY] === 'true' || false;
 
     // Whenever theme/editor are updated, set their values in storage
     autorun(() => {
@@ -46,5 +48,10 @@ export class SettingsStore {
   @action.bound
   setCompactMode(value) {
     this.isCompactModeEnabled = value;
+  }
+
+  @action.bound
+  setIsCompactMode(value) {
+    this.isCompactMode = value;
   }
 }

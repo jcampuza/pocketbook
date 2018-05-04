@@ -120,7 +120,7 @@ const Core = () => (
               </NavLink>
               {settingsStore.isCompactModeEnabled && (
                 <ExpandButton
-                  onClick={() => settingsStore.setCompactMode(false)}
+                  onClick={() => settingsStore.setIsCompactMode(false)}
                 >
                   Expand
                 </ExpandButton>
@@ -143,7 +143,7 @@ const Core = () => (
 debugLog('APPLICATION MOUNTING');
 render(<Core />, window.document.getElementById('app-container'));
 
-(function checkForFirstRun() {
+(function checkForUpdates() {
   const version = storage.getItem('version');
 
   if (version == null) {
