@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { useLocalStore } from 'mobx-react';
-import { AppStorage } from '../util/storage';
+import { useLocalStore } from 'mobx-react-lite';
+import { AppStorage } from '../lib/storage';
 import { SettingsStore } from './SettingsStore';
 import { NotificationStore } from './NotificationStore';
 import { ThemeStore } from './ThemeStore';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { withTheme } from 'styled-components';
+import { withTheme } from '../styled-components';
 
 export const ScriptIcon = withTheme(
   ({ width = '24', height = '24', theme }) => {

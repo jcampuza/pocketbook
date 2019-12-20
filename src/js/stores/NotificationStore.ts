@@ -5,6 +5,7 @@ interface Notification {
   title: string;
   sticky?: boolean;
   timer?: number;
+  type?: string;
 }
 
 interface StoreNotification extends Notification {
@@ -40,7 +41,7 @@ export class NotificationStore {
 
     if (notification != null) {
       clearTimeout(notification.timer);
-      this.notifications = this.notifications.filter(n => n === notification);
+      this.notifications = this.notifications.filter(n => n !== notification);
     }
   }
 

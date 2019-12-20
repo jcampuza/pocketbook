@@ -1,7 +1,7 @@
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled from 'styled-components';
+import styled from '../styled-components';
 import { useStore } from '../stores/useStore';
 import { CSSTransitionProps } from 'react-transition-group/CSSTransition';
 
@@ -24,7 +24,7 @@ const NotificationDiv = styled.div`
   box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.33);
 `;
 
-const NotificationTitle = styled.h4<{ type: string }>`
+const NotificationTitle = styled.h4<{ type?: string }>`
   margin: 0;
   font-size: 1rem;
   color: ${props => (props.type === 'error' ? '#e02727' : '')};
@@ -53,7 +53,7 @@ export function Fade({ children, ...props }: CSSTransitionProps) {
 interface NotificationProps {
   title: string;
   message: string;
-  type: string;
+  type?: string;
   onRemove: () => void;
 }
 
@@ -81,7 +81,7 @@ export const NotificationContainer = observer(() => {
     <AppModals>
       <TransitionGroup className="notification">
         {notifications.map(n => (
-          <Fade key={n}>
+          <Fade key={n.id} timeout={n.timer || 3000}>
             <Notification
               title={n.title}
               message={n.message}

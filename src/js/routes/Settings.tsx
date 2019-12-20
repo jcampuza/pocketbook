@@ -1,10 +1,11 @@
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from '../styled-components';
 import { RootStore, useStore } from '../stores/useStore';
-import { Button, ButtonContainer } from '../ui/Button';
-import { TextArea } from '../ui/Textarea';
-import { editorThemes, extensionThemes } from '../util/themes';
+import { Button, ButtonContainer } from '../components/Button';
+import { TextArea } from '../components/TextArea';
+import { editorThemes, extensionThemes } from '../lib/themes';
+import { copyToClipboard } from '../lib/clipboard';
 
 const SettingsContainer = styled.div`
   position: relative;
@@ -48,7 +49,9 @@ interface OptionListProps {
 const OptionList = ({ options }: OptionListProps) => (
   <>
     {options.map(option => (
-      <option value={option.value}>{option.label}</option>
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
     ))}
   </>
 );
@@ -90,6 +93,7 @@ export const Settings = observer(props => {
   const onExportClicked = () => {
     const generatedExport = JSON.stringify(injected.scripts);
     setState({ isExporting: true, generatedExport });
+    copyToClipboard(generatedExport);
   };
 
   const onImportClicked = () => {
@@ -103,7 +107,7 @@ export const Settings = observer(props => {
 
   const submitImport = () => {
     const { importText } = state;
-    const { addNotification, bulkImport } = props;
+    const { addNotification, bulkImport } = injected;
 
     try {
       bulkImport(importText);
@@ -121,8 +125,7 @@ export const Settings = observer(props => {
   };
 
   const { importText, isImporting, isExporting, generatedExport } = state;
-
-  const { editorTheme, setTheme, currentTheme } = props;
+  const { editorTheme, setTheme, currentTheme } = injected;
 
   return (
     <SettingsContainer>
@@ -142,7 +145,7 @@ export const Settings = observer(props => {
         <SelectLabel>Extension Theme</SelectLabel>
         <SelectInput
           value={currentTheme}
-          onChange={e => setTheme(e.target.value)}
+          onChange={e => setTheme(e.currentTarget.value as 'light' | 'dark')}
         >
           <OptionList
             options={extensionThemes.map(theme => ({
@@ -170,7 +173,22 @@ export const Settings = observer(props => {
       )}
 
       {isExporting && (
-        <TextArea value={generatedExport}>{state.generatedExport}</TextArea>
+        <>
+          <pre
+            style={{
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+              padding: '0.5rem',
+              backgroundColor: 'black',
+              color: '#eaeaea',
+            }}
+          >
+            {state.generatedExport}
+          </pre>
+          <p>
+            You can copy the above into another pocketbook in order to import
+          </p>
+        </>
       )}
     </SettingsContainer>
   );

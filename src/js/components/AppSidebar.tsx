@@ -1,11 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Script } from '../util';
+import styled from '../styled-components';
+import { Script } from '../lib/util';
 
 const SidebarContainer = styled.section`
   position: relative;
   display: flex;
   flex-direction: column;
+  border-left: 1px solid ${props => props.theme.borderColor};
   width: 210px;
   background-color: ${props => props.theme.sidebarColor};
   color: ${props => props.theme.secondaryTextColor};
@@ -98,7 +99,7 @@ export const AppSidebar = ({
     <SearchInput
       value={searchInput}
       onChange={onSearchFilterChanged}
-      placeholder="Filter scripts..."
+      placeholder="Search..."
     />
     <SidebarListContainer>
       <SidebarList>
@@ -112,7 +113,7 @@ export const AppSidebar = ({
           />
         ))}
         <SidebarAddListItem onClick={onAddItemClicked}>
-          Add New Script
+          + Add New Script
         </SidebarAddListItem>
       </SidebarList>
     </SidebarListContainer>

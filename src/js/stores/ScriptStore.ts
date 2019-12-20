@@ -1,7 +1,7 @@
 import { observable, action, autorun } from 'mobx';
 import { mockScripts } from '../mocks';
-import { guid, Script } from '../util';
-import { AppStorage } from '../util/storage';
+import { guid, Script } from '../lib/util';
+import { AppStorage } from '../lib/storage';
 
 export class ScriptStore {
   @observable scripts: Script[] = [];
@@ -29,7 +29,6 @@ export class ScriptStore {
 
   @action.bound
   addScript(script: Script) {
-    console.log(script);
     this.scripts.push(script);
   }
 

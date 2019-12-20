@@ -1,14 +1,14 @@
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
-import styled from 'styled-components';
+import styled from './styled-components';
 import '../css/popup.css';
 import { NotificationContainer } from './components/ModalContainer';
 import { About, Main, Settings } from './routes';
 import { RootStore, useStore } from './stores/useStore';
-import { AboutIcon, ScriptIcon, SettingsIcon } from './ui/Icons';
-import { debugLog } from './util';
-import { VERSION } from './util/constants';
+import { AboutIcon, ScriptIcon, SettingsIcon } from './components/Icons';
+import { debugLog } from './lib/util';
+import { VERSION } from './lib/constants';
 
 const AppContainer = styled.div<{ compact: boolean }>`
   position: relative;
@@ -18,19 +18,12 @@ const AppContainer = styled.div<{ compact: boolean }>`
   height: ${({ compact }) => (compact ? '250px' : '500px')};
 `;
 
-const ContainerBase = observer(({ children, isCompactModeEnabled }) => (
-  <AppContainer compact={isCompactModeEnabled}>{children}</AppContainer>
-));
-
-const selector = (stores: RootStore) => ({
-  isCompactModeEnabled: stores.settingsStore.isCompactModeEnabled,
-});
-
 const Container = (props: { children: React.ReactNode }) => {
-  const stores = useStore();
-  const injected = selector(stores);
+  const { settingsStore } = useStore();
 
-  return <ContainerBase {...injected} {...props} />;
+  return (
+    <AppContainer {...props} compact={settingsStore.isCompactModeEnabled} />
+  );
 };
 
 const AppNavigationContainer = styled.aside`
@@ -39,7 +32,8 @@ const AppNavigationContainer = styled.aside`
   flex: 0 0 8%;
   height: 100%;
   min-width: 50px;
-  background-color: ${props => props.theme.navColor};
+  border-right: 1px solid ${props => props.theme.borderColor};
+  background-color: ${props => props.theme.sidebarColor};
 `;
 
 const AppNavigation = styled.nav`

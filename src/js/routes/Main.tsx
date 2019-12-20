@@ -1,19 +1,19 @@
-import { observer } from 'mobx-react';
-import React, { Component, useEffect } from 'react';
-import styled from 'styled-components';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import styled from '../styled-components';
 import { AppSidebar } from '../components/AppSidebar';
 import { CodeEditor } from '../components/CodeEditor';
 import { EditScript } from '../components/EditScript';
-import { Button } from '../ui/Button';
+import { Button } from '../components/Button';
 import {
   createDefaultScript,
   findById,
   getLastSelectedScriptFromStorage,
   Script,
-} from '../util';
-import { injectScript } from '../util/injectScript';
+} from '../lib/util';
+import { injectScript } from '../lib/injectScript';
 import { useStore, RootStore } from '../stores/useStore';
-import { useReactState } from '../util/useReactState';
+import { useReactState } from '../lib/useReactState';
 
 const AppMainContainer = styled.main<{ fullWidth: boolean }>`
   flex: 1 0 66%;
@@ -120,10 +120,6 @@ export const Main = observer(() => {
 
   const toggleSidebar = () => {
     setState({ mainViewExpanded: !state.mainViewExpanded });
-  };
-
-  const toggleCreating = () => {
-    setState({ isCreating: true });
   };
 
   const toggleEditing = () => {

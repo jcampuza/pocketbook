@@ -1,7 +1,7 @@
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { ThemeProvider } from 'styled-components';
 import { useStore } from '../stores/useStore';
+import { ThemeProvider } from '../styled-components';
 
 export const AppThemeProvider = observer(({ children }) => {
   const {

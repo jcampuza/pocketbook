@@ -4,9 +4,11 @@ export const themes = {
     navColor: 'rgb(232,232,232)',
     sidebarColor: 'rgb(245,245,245)',
     textColor: '#222222',
+    secondaryTextColor: '#000000',
     listItemOddColor: '#dedede',
     listItemActiveColor: '#ffffff',
     iconColor: 'rgb(35, 35, 35)',
+    borderColor: '#CCC',
   },
   dark: {
     primaryColor: 'rgb(18, 18, 18)',
@@ -17,10 +19,13 @@ export const themes = {
     listItemOddColor: 'rgb(18, 18, 18)',
     listItemActiveColor: 'rgb(71, 71, 71)',
     iconColor: '#DEDEDE',
+    borderColor: '#666',
   },
 };
 
-export const extensionThemes = ['dark', 'light'];
+export type AppTheme = typeof themes['light'];
+
+export const extensionThemes = ['dark', 'light'] as const;
 
 export const editorThemes = [
   'ambiance',
@@ -31,9 +36,12 @@ export const editorThemes = [
   'cobalt',
   'crimson_editor',
   'dawn',
+  'dracula',
   'dreamweaver',
   'eclipse',
   'github',
+  'gob',
+  'gruvbox',
   'idle_fingers',
   'iplastic',
   'katzenmilch',

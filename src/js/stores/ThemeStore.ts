@@ -1,6 +1,6 @@
 import { observable, autorun, computed, action } from 'mobx';
-import { themes } from '../util/themes';
-import { AppStorage } from '../util/storage';
+import { themes } from '../lib/themes';
+import { AppStorage } from '../lib/storage';
 
 type Theme = keyof typeof themes;
 

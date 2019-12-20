@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { CodeEditor } from '../components/CodeEditor';
-import { Button } from '../ui/Button';
-import { TextArea } from '../ui/Textarea';
-import { TextInput } from '../ui/TextInput';
-import styled from 'styled-components';
-import { Script } from '../util';
+import { Button } from './Button';
+import { TextArea } from './TextArea';
+import { TextInput } from './TextInput';
+import styled from '../styled-components';
+import { Script } from '../lib/util';
 
 const ScriptContainer = styled.section`
   padding: 0.5rem 1rem;
@@ -65,8 +65,6 @@ export const EditScript = (props: EditScriptProps) => {
 
   return (
     <ScriptContainer>
-      <ScriptTitle>Editing: {title}</ScriptTitle>
-
       <TextInput
         type="text"
         name="title"
