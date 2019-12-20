@@ -31,9 +31,9 @@ if (fileSystem.existsSync(secretsPath)) {
 
 const options = {
   entry: {
-    popup: path.join(__dirname, 'src', 'js', 'popup.js'),
-    options: path.join(__dirname, 'src', 'js', 'options.js'),
-    background: path.join(__dirname, 'src', 'js', 'background.js'),
+    popup: path.join(__dirname, 'src', 'js', 'popup.tsx'),
+    options: path.join(__dirname, 'src', 'js', 'options.ts'),
+    background: path.join(__dirname, 'src', 'js', 'background.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -57,7 +57,7 @@ const options = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
@@ -67,7 +67,7 @@ const options = {
     alias: alias,
     extensions: fileExtensions
       .map(extension => '.' + extension)
-      .concat(['.jsx', '.js', '.css']),
+      .concat(['.jsx', '.js', '.ts', '.tsx', '.css']),
   },
   plugins: [
     // clean the build folder

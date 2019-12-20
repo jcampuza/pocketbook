@@ -1,17 +1,20 @@
 import { observable, action, autorun } from 'mobx';
-import { themes, extensionThemes, editorThemes } from '../util/themes';
+import { extensionThemes, editorThemes } from '../util/themes';
+import { AppStorage } from '../util/storage';
 
 const THEME_KEY = 'settings:theme';
 const EDITOR_KEY = 'settings:editor';
 const COMPACT_MODE_KEY = 'settings:compact';
 
 export class SettingsStore {
-  @observable editorTheme;
-  @observable theme;
-  @observable isCompactMode;
-  @observable isCompactModeEnabled;
+  @observable editorTheme: string;
+  @observable theme: string;
+  @observable isCompactMode: boolean;
+  @observable isCompactModeEnabled: boolean;
 
-  constructor(storage) {
+  _storage: AppStorage;
+
+  constructor(storage: AppStorage) {
     this._storage = storage;
 
     const userPrefs = this._storage.getItems(
@@ -36,22 +39,22 @@ export class SettingsStore {
   }
 
   @action.bound
-  setEditorTheme(value) {
+  setEditorTheme(value: string) {
     this.editorTheme = value;
   }
 
   @action.bound
-  setTheme(value) {
+  setTheme(value: string) {
     this.theme = value;
   }
 
   @action.bound
-  setCompactMode(value) {
+  setCompactMode(value: boolean) {
     this.isCompactModeEnabled = value;
   }
 
   @action.bound
-  setIsCompactMode(value) {
+  setIsCompactMode(value: boolean) {
     this.isCompactMode = value;
   }
 }

@@ -1,12 +1,26 @@
 import { observable, action } from 'mobx';
 
+interface Notification {
+  message: string;
+  title: string;
+  sticky?: boolean;
+  timer?: number;
+}
+
+interface StoreNotification extends Notification {
+  id: number;
+}
+
 export class NotificationStore {
-  @observable notifications = [];
+  @observable notifications: StoreNotification[] = [];
 
   @action.bound
-  addNotification(notification, timeout = 4000) {
+  addNotification(notification: Notification, timeout = 4000) {
     const id = Date.now();
-    notification.id = id;
+    const storeNotification = {
+      ...notification,
+      id,
+    };
 
     if (!notification.sticky) {
       notification.timer = setTimeout(
@@ -15,20 +29,19 @@ export class NotificationStore {
       );
     }
 
-    this.notifications.push(notification);
+    this.notifications.push(storeNotification as StoreNotification);
   }
 
   @action.bound
-  removeNotification(notificationId) {
+  removeNotification(notificationId: number) {
     const notification = this.notifications.find(
       element => element.id === notificationId,
     );
 
     if (notification != null) {
       clearTimeout(notification.timer);
-      this.notifications.remove(notification);
+      this.notifications = this.notifications.filter(n => n === notification);
     }
-    console.log('removed notification', notificationId);
   }
 
   @action.bound

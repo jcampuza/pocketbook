@@ -1,18 +1,25 @@
 import { observable, action, autorun } from 'mobx';
 import { mockScripts } from '../mocks';
-import { guid } from '../util';
+import { guid, Script } from '../util';
+import { AppStorage } from '../util/storage';
 
 export class ScriptStore {
-  @observable scripts = [];
+  @observable scripts: Script[] = [];
   @observable
-  filtered = {
+  filtered: { query: string; result: Script[] } = {
     query: '',
     result: [],
   };
 
-  constructor(storage) {
+  _storage: AppStorage;
+
+  constructor(storage: AppStorage) {
     this._storage = storage;
-    this.scripts = JSON.parse(this._storage.getItem('scripts')) || mockScripts;
+    const scriptsFromStorage = this._storage.getItem('scripts');
+
+    this.scripts = scriptsFromStorage
+      ? JSON.parse(scriptsFromStorage)
+      : mockScripts;
 
     autorun(() => {
       const scripts = this.scripts.slice();
@@ -21,21 +28,22 @@ export class ScriptStore {
   }
 
   @action.bound
-  addScript(script) {
+  addScript(script: Script) {
+    console.log(script);
     this.scripts.push(script);
   }
 
   @action.bound
-  removeScript(id) {
+  removeScript(id: string) {
     const scriptToRemove = this.scripts.find(script => script.id === id);
 
     if (scriptToRemove) {
-      this.scripts.remove(scriptToRemove);
+      this.scripts = this.scripts.filter(s => s !== scriptToRemove);
     }
   }
 
   @action.bound
-  editScript(script) {
+  editScript(script: Script) {
     const idx = this.scripts.findIndex(s => script.id === s.id);
 
     if (idx) {
@@ -60,7 +68,7 @@ export class ScriptStore {
   }
 
   @action.bound
-  bulkImport(jsonText) {
+  bulkImport(jsonText: string) {
     try {
       const parsedJson = JSON.parse(jsonText);
 

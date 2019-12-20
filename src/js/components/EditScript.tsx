@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { TextArea } from '../ui/Textarea';
 import { TextInput } from '../ui/TextInput';
 import styled from 'styled-components';
+import { Script } from '../util';
 
 const ScriptContainer = styled.section`
   padding: 0.5rem 1rem;
@@ -16,11 +17,33 @@ const ScriptContainer = styled.section`
   }
 `;
 
-export const EditScript = props => {
+const ScriptTitle = styled.h3`
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  color: ${props => props.theme.textColor};
+`;
+
+const ScriptActions = styled.div`
+  margin-top: auto;
+
+  > * + * {
+    margin-left: 0.5rem;
+  }
+`;
+
+interface EditScriptProps {
+  script: Script;
+  onCancel: () => void;
+  onSubmit: (script: Script) => void;
+}
+
+export const EditScript = (props: EditScriptProps) => {
   const [dirty, setDirty] = useState(props.script);
 
-  const updateField = e => {
-    const { name, value } = e.target;
+  const updateField = (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
+    const { name, value } = e.currentTarget;
 
     setDirty(curr => ({
       ...curr,
@@ -28,7 +51,7 @@ export const EditScript = props => {
     }));
   };
 
-  const onEditorChange = value => {
+  const onEditorChange = (value: string) => {
     const name = 'body';
 
     setDirty(curr => ({

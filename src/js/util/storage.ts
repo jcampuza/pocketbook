@@ -3,17 +3,20 @@
  * implements most of the same interface, but includes some sugar on top
  */
 
-export class Storage {
-  constructor(storage) {
+export class AppStorage {
+  storage: Storage;
+
+  constructor(storage: Storage) {
     this.storage = storage;
   }
 
-  getItem(key) {
+  getItem(key: string) {
     return this.storage.getItem(key);
   }
 
-  getItems(...keys) {
-    const res = {};
+  getItems(...keys: string[]) {
+    const res: Record<string, any> = {};
+
     for (const key of keys) {
       res[key] = localStorage.getItem(key);
     }
@@ -21,21 +24,21 @@ export class Storage {
     return res;
   }
 
-  setItem(key, value) {
+  setItem(key: string, value: any) {
     this.storage.setItem(key, value);
   }
 
-  setItems(keyValuePairs) {
-    for (const key of Object.keys(keyValuePairs)) {
-      this.storage.setItem(key, keyValuePairs[key]);
+  setItems(keyValuePairs: Record<string, any>) {
+    for (const [key, value] of Object.entries(keyValuePairs)) {
+      this.storage.setItem(key, value);
     }
   }
 
-  removeItem(key) {
+  removeItem(key: string) {
     this.storage.removeItem(key);
   }
 
-  removeItems(...keys) {
+  removeItems(...keys: string[]) {
     for (const key of keys) {
       this.storage.removeItem(key);
     }
@@ -45,7 +48,7 @@ export class Storage {
     this.storage.clear();
   }
 
-  has(key) {
+  has(key: string) {
     return this.storage.getItem(key) != null;
   }
 }

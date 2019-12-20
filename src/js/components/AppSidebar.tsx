@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Script } from '../util';
 
 const SidebarContainer = styled.section`
   position: relative;
@@ -25,7 +26,7 @@ const SidebarList = styled.ul`
   height: 100%;
 `;
 
-const SidebarListItem = styled.li`
+const SidebarListItem = styled.li<{ active?: boolean }>`
   padding: 0.5rem 0.5rem;
   display: flex;
   justify-content: space-between;
@@ -42,7 +43,19 @@ const SidebarAddListItem = styled(SidebarListItem)`
   margin-top: auto;
 `;
 
-const ScriptListItem = ({ active, script, onClick, onQuickActionClicked }) => {
+interface ScriptListItemProps {
+  active: boolean;
+  script: Script;
+  onClick: (id: Script['id']) => void;
+  onQuickActionClicked: (id: Script['id']) => void;
+}
+
+const ScriptListItem = ({
+  active,
+  script,
+  onClick,
+  onQuickActionClicked,
+}: ScriptListItemProps) => {
   const { title, id } = script;
 
   return (
@@ -64,6 +77,15 @@ const SearchInput = styled.input`
   }
 `;
 
+interface AppSidebarProps {
+  onListItemClicked: (id: string) => void;
+  onAddItemClicked: () => void;
+  onQuickActionClicked: (id: string) => void;
+  onSearchFilterChanged: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  searchInput: string;
+  scripts: Script[];
+}
+
 export const AppSidebar = ({
   onListItemClicked,
   onAddItemClicked,
@@ -71,7 +93,7 @@ export const AppSidebar = ({
   onSearchFilterChanged,
   searchInput,
   scripts,
-}) => (
+}: AppSidebarProps) => (
   <SidebarContainer>
     <SearchInput
       value={searchInput}

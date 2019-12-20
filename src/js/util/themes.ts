@@ -56,5 +56,5 @@ export const editorThemes = [
   'tomorrow_night_eighties',
   'twilight',
   'vibrant_ink',
-  'xcods',
+  'xcode',
 ];

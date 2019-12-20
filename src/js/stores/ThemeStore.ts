@@ -1,12 +1,17 @@
 import { observable, autorun, computed, action } from 'mobx';
 import { themes } from '../util/themes';
+import { AppStorage } from '../util/storage';
+
+type Theme = keyof typeof themes;
 
 export class ThemeStore {
-  @observable currentTheme;
+  @observable currentTheme: Theme;
 
-  constructor(storage) {
+  _storage: AppStorage;
+
+  constructor(storage: AppStorage) {
     this._storage = storage;
-    this.currentTheme = this._storage.getItem('theme') || 'light';
+    this.currentTheme = (this._storage.getItem('theme') as Theme) || 'light';
 
     autorun(() => {
       this._storage.setItem('theme', this.currentTheme);
@@ -14,13 +19,12 @@ export class ThemeStore {
   }
 
   @action.bound
-  setTheme(theme) {
+  setTheme(theme: Theme) {
     this.currentTheme = theme;
   }
 
   @computed
   get theme() {
-    console.log('getting theme');
     return themes[this.currentTheme];
   }
 }
