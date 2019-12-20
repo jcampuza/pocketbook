@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { TextInput } from '../ui/TextInput';
 
 const SidebarContainer = styled.section`
   position: relative;
@@ -38,7 +37,7 @@ const SidebarListItem = styled.li`
   }
 `;
 
-const SidebarAddListItem = SidebarListItem.extend`
+const SidebarAddListItem = styled(SidebarListItem)`
   border: none;
   margin-top: auto;
 `;

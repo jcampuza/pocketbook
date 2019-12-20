@@ -17,6 +17,10 @@ export function guid() {
 }
 
 export function getLastSelectedScriptFromStorage(scripts) {
+  if (scripts.length && scripts.length === 1) {
+    return scripts[0];
+  }
+
   const lastSelectedId = localStorage.getItem('last-selected');
 
   return scripts.find(script => script.id === lastSelectedId);

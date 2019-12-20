@@ -1,29 +1,22 @@
+import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { observer, inject } from 'mobx-react';
-
-import { injectScript } from '../util/injectScript';
-import { CodeEditor } from '../components/CodeEditor';
-import { mockScripts } from '../mocks';
 import { AppSidebar } from '../components/AppSidebar';
+import { CodeEditor } from '../components/CodeEditor';
+import { EditScript } from '../components/EditScript';
 import { Button } from '../ui/Button';
 import {
   createDefaultScript,
-  guid,
-  getLastSelectedScriptFromStorage,
   findById,
+  getLastSelectedScriptFromStorage,
 } from '../util';
-import { TextInput } from '../ui/TextInput';
-import { TextArea } from '../ui/Textarea';
-
-const scripts = JSON.parse(localStorage.getItem('scripts')) || mockScripts;
+import { injectScript } from '../util/injectScript';
 
 const AppMainContainer = styled.main`
   flex: 1 0 66%;
   height: 100vh;
   overflow-y: auto;
-  color: ${props => props.theme.textColor}
+  color: ${props => props.theme.textColor};
   background-color: ${props => props.theme.primaryColor};
 
   flex-basis: ${props => (props.fullWidth ? '92%' : '66%')};
@@ -67,72 +60,6 @@ const ScriptActions = styled.div`
     margin-left: 0.5rem;
   }
 `;
-
-class EditScript extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      dirty: {
-        ...props.script,
-      },
-    };
-  }
-
-  updateField = e => {
-    const { name, value } = e.target;
-
-    const dirty = {
-      ...this.state.dirty,
-      [name]: value,
-    };
-
-    this.setState({ dirty });
-  };
-
-  onEditorChange = value => {
-    const name = 'body';
-
-    const dirty = {
-      ...this.state.dirty,
-      [name]: value,
-    };
-
-    this.setState({ dirty });
-  };
-
-  render() {
-    const { title, description, body } = this.state.dirty;
-
-    const { onCancel, onSubmit } = this.props;
-
-    return (
-      <ScriptContainer>
-        <ScriptTitle>Editing: {title}</ScriptTitle>
-
-        <TextInput
-          type="text"
-          name="title"
-          placeholder="title"
-          value={title}
-          onChange={this.updateField}
-        />
-        <TextArea
-          name="description"
-          placeholder="description"
-          value={description}
-          onChange={this.updateField}
-        />
-
-        <CodeEditor onChange={this.onEditorChange} value={body} />
-        <ScriptActions>
-          <Button onClick={() => onSubmit(this.state.dirty)}>Save</Button>
-          <Button onClick={() => onCancel()}>Cancel</Button>
-        </ScriptActions>
-      </ScriptContainer>
-    );
-  }
-}
 
 const ScriptContent = ({ script, onRun, onEdit, onDelete }) => (
   <React.Fragment>

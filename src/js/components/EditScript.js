@@ -1,67 +1,68 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { CodeEditor } from '../components/CodeEditor';
+import { Button } from '../ui/Button';
+import { TextArea } from '../ui/Textarea';
+import { TextInput } from '../ui/TextInput';
 import styled from 'styled-components';
 
-export class EditScript extends Component {
-  constructor(props) {
-    super(props);
+const ScriptContainer = styled.section`
+  padding: 0.5rem 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
-    this.state = {
-      dirty: {
-        ...props.script
-      }
-    };
+  > * + * {
+    margin-top: 1rem;
   }
+`;
 
-  updateField = (e) => {
+export const EditScript = props => {
+  const [dirty, setDirty] = useState(props.script);
+
+  const updateField = e => {
     const { name, value } = e.target;
 
-    const dirty = {
-      ...this.state.dirty,
+    setDirty(curr => ({
+      ...curr,
       [name]: value,
-    };
+    }));
+  };
 
-    this.setState({ dirty })
-  }
-
-  onEditorChange = (value) => {
+  const onEditorChange = value => {
     const name = 'body';
 
-    const dirty = {
-      ...this.state.dirty,
+    setDirty(curr => ({
+      ...curr,
       [name]: value,
-    };
+    }));
+  };
 
-    this.setState({ dirty });
-  }
+  const { title, description, body } = dirty;
+  const { onCancel, onSubmit } = props;
 
-  render() {
-    const {
-      title,
-      description,
-      body
-    } = this.state.dirty;
+  return (
+    <ScriptContainer>
+      <ScriptTitle>Editing: {title}</ScriptTitle>
 
-    const {
-      onCancel,
-      onSubmit
-    } = this.props;
+      <TextInput
+        type="text"
+        name="title"
+        placeholder="title"
+        value={title}
+        onChange={updateField}
+      />
+      <TextArea
+        name="description"
+        placeholder="description"
+        value={description}
+        onChange={updateField}
+      />
 
-    return (
-      <ScriptContainer>
-        <ScriptTitle>Editing: {title}</ScriptTitle>
-
-        <TextInput type="text" name="title" placeholder="title" value={title} onChange={this.updateField} />
-        <textarea name="description" placeholder="description" value={description} onChange={this.updateField} />
-
-        <CodeEditor
-          onChange={this.onEditorChange}
-          value={body}
-        />
-        <ScriptActions>
-          <Button onClick={() => onSubmit(this.state.dirty)}>Save</Button>
-          <Button onClick={() => onCancel()}>Cancel</Button>
-        </ScriptActions>
-      </ScriptContainer>
-    )
-  }
-}
+      <CodeEditor onChange={onEditorChange} value={body} />
+      <ScriptActions>
+        <Button onClick={() => onSubmit(dirty)}>Save</Button>
+        <Button onClick={() => onCancel()}>Cancel</Button>
+      </ScriptActions>
+    </ScriptContainer>
+  );
+};
